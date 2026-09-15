@@ -1,0 +1,101 @@
+<style>
+/* Shimmer Animation */
+@keyframes tableShimmer {
+  0% {
+    background-position: -450px 0;
+  }
+  100% {
+    background-position: 450px 0;
+  }
+}
+
+.shimmer-placeholder {
+  height: 18px;
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #eef0f2 0%, #e2e5e9 20%, #eef0f2 40%, #eef0f2 100%);
+  background-repeat: no-repeat;
+  background-size: 800px 104px;
+  display: inline-block;
+  position: relative;
+  animation-duration: 1.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: tableShimmer;
+  animation-timing-function: linear;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Skeleton Table Styles */
+.table-skeleton {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.table-skeleton th, .table-skeleton td {
+  padding: 12px 15px;
+  border: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.table-skeleton th {
+  background-color: #fafafa;
+}
+
+/* Hidden table state */
+.real-table-wrapper.dt-loading {
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  display: block !important;
+}
+
+.real-table-wrapper {
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+}
+
+/* Dark Mode support */
+body.dark-only .shimmer-placeholder {
+  background: #1b1e27;
+  background-image: linear-gradient(to right, #1b1e27 0%, #262a36 20%, #1b1e27 40%, #1b1e27 100%);
+}
+body.dark-only .table-skeleton th, body.dark-only .table-skeleton td {
+  border-color: #262a36;
+}
+body.dark-only .table-skeleton th {
+  background-color: #161920;
+}
+</style>
+
+<div class="table-skeleton-wrapper">
+    <div class="table-responsive theme-scrollbar">
+        <table class="table table-bordered table-skeleton">
+            <thead>
+                <tr>
+                    <th style="width: 50px;"><div class="shimmer-placeholder"></div></th>
+                    <th><div class="shimmer-placeholder"></div></th>
+                    <th><div class="shimmer-placeholder"></div></th>
+                    <th><div class="shimmer-placeholder"></div></th>
+                    <th><div class="shimmer-placeholder"></div></th>
+                    <th><div class="shimmer-placeholder"></div></th>
+                    <th style="width: 120px;"><div class="shimmer-placeholder"></div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (let k = 0; k < 6; k++) { %>
+                <tr>
+                    <td><div class="shimmer-placeholder"></div></td>
+                    <td><div class="shimmer-placeholder" style="width: 70%;"></div></td>
+                    <td><div class="shimmer-placeholder" style="width: 85%;"></div></td>
+                    <td><div class="shimmer-placeholder" style="width: 90%;"></div></td>
+                    <td><div class="shimmer-placeholder" style="width: 65%;"></div></td>
+                    <td><div class="shimmer-placeholder" style="width: 80%;"></div></td>
+                    <td><div class="shimmer-placeholder" style="width: 90%;"></div></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>

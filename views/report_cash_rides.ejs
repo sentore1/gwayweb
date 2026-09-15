@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3>Cash Rides Report</h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item active">Cash Rides Report</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header col-12 pb-0">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group mb-3">
+                                    <label class="col-label"><%=lan.start%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreports" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group mb-3">
+                                    <label class="col-label"><%=lan.end%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreporte" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group mb-3">
+                                    <label class="col-label">Zone</label>
+                                    <select class="js-example-basic-single" id="report_zone_id" style="width: 100%;">
+                                        <option value="0" selected>All Zones</option>
+                                        <% zones.forEach((val) => { %>
+                                            <option value="<%= val.id %>"><%= val.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Ride ID</th>
+                                            <th>Rider</th>
+                                            <th>Driver</th>
+                                            <th>Total Fare</th>
+                                            <th>Platform Commission</th>
+                                            <th>Driver Net Share</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cash_rides_report">
+                                        <% let i = 1 %>
+                                        <% rd.forEach((val) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td><a href="/rides/codetail/<%= val.id %>">#<%= val.id %></a></td>
+                                                <td><%= val.cname %></td>
+                                                <td><%= val.dfname %> <%= val.dlname %> (<%= val.dccode %> <%= val.dphone %>)</td>
+                                                <td class="invosymbol"><%= Number(val.total_fare).toFixed(2) %></td>
+                                                <td class="invosymbol"><%= Number(val.commission).toFixed(2) %></td>
+                                                <td class="invosymbol"><%= (Number(val.total_fare) - Number(val.commission)).toFixed(2) %></td>
+                                                <td><%= val.start_time %></td>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 text-end form-group">
+                                <button class="btn btn-square btn-primary b-r-10" id="down_cash_rides_report" style="margin-top: 30px;" type="button">Download Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+  </body>
+</html>

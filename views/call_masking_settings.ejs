@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <style>
+      .theme-form label.col-form-label {
+        color: #2b2b2b !important;
+        font-weight: 500;
+      }
+    </style>
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>Call Masking Settings</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                            <li class="breadcrumb-item">Dashboard</li>
+                            <li class="breadcrumb-item active">Call Masking Settings</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container-fluid starts-->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <h5>Masking Credentials & Fallback Details</h5>
+                            <span>Configure authentication credentials and voice proxy configurations for all supported voice bridge providers.</span>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof success != 'undefined' && success != '') { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <%= success %>
+                                    <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+                            <% if (typeof errors != 'undefined' && errors != '') { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <%= errors %>
+                                    <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+
+                            <form class="theme-form" action="/settings/update_call_masking" method="POST">
+                                <!-- Global Fallback block -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="icofont icofont-support"></i> Fallback Support Helpline</h5>
+                                        <div class="form-group col-md-6 col-sm-12 px-0">
+                                            <label class="col-form-label">Fallback Support Phone Number (With Country Code)</label>
+                                            <input class="form-control" type="text" name="fallback_number" value="<%= settings.fallback_number %>" placeholder="e.g. +1234567890" required>
+                                            <small class="text-muted">This helpline contact will be displayed on active ride screens in the mobile applications as a failover if the active masking bridge provider fails to connect callers.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Credentials Accordion / Sections -->
+                                <div class="row">
+                                    <!-- Twilio Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-brand-twilio"></i> Twilio Voice Credentials <a href="https://www.twilio.com/docs/voice" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Account SID</label>
+                                                <input class="form-control" type="text" name="twilio_voice_sid" value="<%= settings.twilio_voice_sid %>" placeholder="Enter Twilio Account SID">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Auth Token</label>
+                                                <input class="form-control" type="password" name="twilio_voice_token" value="<%= settings.twilio_voice_token %>" placeholder="Enter Twilio Auth Token">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">Twilio Outbound Caller Number</label>
+                                                <input class="form-control" type="text" name="twilio_voice_number" value="<%= settings.twilio_voice_number %>" placeholder="e.g. +1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Plivo Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-ui-call"></i> Plivo Voice Credentials <a href="https://www.plivo.com/docs/voice" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Auth ID</label>
+                                                <input class="form-control" type="text" name="plivo_auth_id" value="<%= settings.plivo_auth_id %>" placeholder="Enter Plivo Auth ID">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Auth Token</label>
+                                                <input class="form-control" type="password" name="plivo_auth_token" value="<%= settings.plivo_auth_token %>" placeholder="Enter Plivo Auth Token">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">Plivo Caller Number</label>
+                                                <input class="form-control" type="text" name="plivo_voice_number" value="<%= settings.plivo_voice_number %>" placeholder="e.g. +1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Exotel Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-ui-call"></i> Exotel Voice Credentials <a href="https://docs.exotel.com/" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Account SID</label>
+                                                <input class="form-control" type="text" name="exotel_sid" value="<%= settings.exotel_sid %>" placeholder="Enter Exotel Account SID">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">API Token</label>
+                                                <input class="form-control" type="password" name="exotel_token" value="<%= settings.exotel_token %>" placeholder="Enter Exotel API Token">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Subaccount / App SID (Optional)</label>
+                                                <input class="form-control" type="text" name="exotel_subaccount" value="<%= settings.exotel_subaccount %>" placeholder="Enter Subaccount SID">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">Exotel ExoPhone Number</label>
+                                                <input class="form-control" type="text" name="exotel_voice_number" value="<%= settings.exotel_voice_number %>" placeholder="e.g. 080XXXXXX">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sinch Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-ui-call"></i> Sinch Voice Credentials <a href="https://developers.sinch.com/docs/voice" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Application Key</label>
+                                                <input class="form-control" type="text" name="sinch_app_key" value="<%= settings.sinch_app_key %>" placeholder="Enter Sinch App Key">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">Application Secret</label>
+                                                <input class="form-control" type="password" name="sinch_app_secret" value="<%= settings.sinch_app_secret %>" placeholder="Enter Sinch Application Secret">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">Sinch Caller Number</label>
+                                                <input class="form-control" type="text" name="sinch_voice_number" value="<%= settings.sinch_voice_number %>" placeholder="e.g. +1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Vonage Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-ui-call"></i> Vonage Voice Credentials <a href="https://developer.vonage.com/en/voice/voice-api/overview" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">API Key</label>
+                                                <input class="form-control" type="text" name="vonage_api_key" value="<%= settings.vonage_api_key %>" placeholder="Enter Vonage API Key">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">API Secret</label>
+                                                <input class="form-control" type="password" name="vonage_api_secret" value="<%= settings.vonage_api_secret %>" placeholder="Enter Vonage API Secret">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">Vonage Virtual Number</label>
+                                                <input class="form-control" type="text" name="vonage_voice_number" value="<%= settings.vonage_voice_number %>" placeholder="e.g. +1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- EnableX Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-ui-call"></i> EnableX Voice Credentials <a href="https://developer.enablex.io/docs/voice-api/" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">App ID</label>
+                                                <input class="form-control" type="text" name="enablex_app_id" value="<%= settings.enablex_app_id %>" placeholder="Enter EnableX App ID">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">App Key</label>
+                                                <input class="form-control" type="password" name="enablex_app_key" value="<%= settings.enablex_app_key %>" placeholder="Enter EnableX App Key">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">EnableX Virtual Number</label>
+                                                <input class="form-control" type="text" name="enablex_voice_number" value="<%= settings.enablex_voice_number %>" placeholder="e.g. +1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- MyOperator Config -->
+                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-4">
+                                        <div class="p-3 border rounded bg-light h-100">
+                                            <h6 class="text-dark border-bottom pb-2 mb-3"><i class="icofont icofont-ui-call"></i> MyOperator Credentials <a href="https://support.myoperator.co" target="_blank" class="float-end text-primary" style="font-size: 12px; font-weight: normal;"><i class="icofont icofont-link-alt"></i> Docs</a></h6>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">API Token</label>
+                                                <input class="form-control" type="text" name="myoperator_token" value="<%= settings.myoperator_token %>" placeholder="Enter MyOperator API Token">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="col-form-label">API Secret</label>
+                                                <input class="form-control" type="password" name="myoperator_secret" value="<%= settings.myoperator_secret %>" placeholder="Enter MyOperator Secret">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <label class="col-form-label">MyOperator Virtual Number</label>
+                                                <input class="form-control" type="text" name="myoperator_voice_number" value="<%= settings.myoperator_voice_number %>" placeholder="e.g. +1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-4 text-end px-0">
+                                    <button class="btn btn-square btn-primary b-r-10 px-4" type="submit">Save Call Masking Settings</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Container-fluid Ends-->
+    </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+</body>
+</html>

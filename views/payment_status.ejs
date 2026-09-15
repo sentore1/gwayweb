@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+    <style>
+        .payment-status-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f7fb;
+            font-family: 'Outfit', sans-serif;
+        }
+        .payment-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #eef1f6;
+        }
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px auto;
+        }
+        .status-icon.success {
+            background: #eefbf3;
+            color: #15803d;
+        }
+        .status-icon.fail {
+            background: #fdf2f2;
+            color: #b91c1c;
+        }
+        .status-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+        .status-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .status-desc {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .details-box {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: left;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .details-row:last-child {
+            margin-bottom: 0;
+        }
+        .details-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        .details-val {
+            color: #1e293b;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .redirect-note {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-status-container">
+        <div class="payment-card">
+            <% if (status === 'success') { %>
+                <div class="status-icon success">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <div class="status-title">Payment Success!</div>
+                <div class="status-desc">Thank you! Your transaction has been successfully processed and your wallet updated.</div>
+            <% } else { %>
+                <div class="status-icon fail">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+                <div class="status-title">Payment Failed</div>
+                <div class="status-desc">Oops! We could not process your transaction. Please try again.</div>
+            <% } %>
+
+            <div class="details-box">
+                <div class="details-row">
+                    <span class="details-label">Transaction ID:</span>
+                    <span class="details-val"><%= transactionId %></span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Amount:</span>
+                    <span class="details-val"><%= amount %></span>
+                </div>
+            </div>
+
+            <% if (redirect_url) { %>
+                <div class="redirect-note">Redirecting you automatically in 3 seconds...</div>
+            <% } else { %>
+                <div class="redirect-note">You can now close this tab and return to the app.</div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        let redirectUrl = "<%= redirect_url %>";
+        let status = "<%= status %>";
+        let transactionId = "<%= transactionId %>";
+        
+        // Normalize status for React website which expects "true" or "false"
+        let isSuccess = status === "success" ? "true" : "false";
+
+        if (redirectUrl && redirectUrl !== "null" && redirectUrl !== "") {
+            setTimeout(function() {
+                window.location.href = redirectUrl + "?status=" + isSuccess + "&transactionId=" + transactionId;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

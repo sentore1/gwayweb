@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3><%=lan.General%> <%=lan.Setting%></h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><%=lan.Dashboard%></li>
+                    <li class="breadcrumb-item active"><%=lan.General%> <%=lan.Setting%></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="card">
+                  <div class="card-body">
+                    <form  class="needs-validation" novalidate="" action="/settings/add_setting" method="post" enctype="multipart/form-data">
+                      <div class="row">
+
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <div class="text-center form-group">
+                            <% if(general.dark_image == "null") { %>
+                                <img id="file-preview" width="150" height="150" src="../images/dashboard/default/profile.png" alt="<%= lan.image_alt %>">
+                            <% } else { %>
+                                <a href="../../<%=general.dark_image%>" target="_blank"><img id="file-preview" width="150" src="../../<%=general.dark_image%>" alt="<%= lan.image_alt %>"></a>
+                            <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label"><%=lan.Dark%> <%=lan.image %></label>
+                            <input class="form-control" style="height: 47px;" type="file" accept="image/*" name="dark_image">
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <div class="text-center form-group">
+                            <% if(general.light_image == "null") { %>
+                                <img id="file-preview" width="150" height="150" src="../images/dashboard/default/profile.png" alt="<%= lan.image_alt %>">
+                            <% } else { %>
+                                <a href="../../<%=general.light_image%>" target="_blank"><img id="file-preview" width="150" src="../../<%=general.light_image%>" style="background-color: black;" alt="<%= lan.image_alt %>"></a>
+                            <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label"><%=lan.Light%> <%=lan.image %></label>
+                            <input class="form-control" style="height: 47px;" type="file" accept="image/*" name="light_image">
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label class="col-form-label"><%=lan.Site%> <%=lan.Title%></label>
+                        <input class="form-control" type="text" name="title" value="<%=general.title%>" placeholder="<%=lan.Enter%> <%=lan.Title%>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label class="col-form-label"><%=lan.Alert%> <%=lan.Tone%></label>
+                        <div class="row">
+                            <div class="col-5">
+                                <audio controls>
+                                    <source src="../../<%=general.alert_tone%>" type="audio/mpeg">
+                                </audio>
+                            </div>
+                            <div class="col-7" style="margin-top: 4px;">
+                                <input class="form-control" type="file" accept="audio/*" name="alert_tone" style="height: 47px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label class="col-form-label"><%=lan.Currency%></label>
+                        <input class="form-control" type="text" name="site_currency" value="<%=general.site_currency%>" placeholder="<%=lan.Enter%> <%=lan.Currency%>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label for="Thousands_Separator" class="form-label"><%=lan.Thousands_Separator%></label>
+                        <select class="form-control wide" name="thousands_separator" required> 
+                            <option value="1" <%= general.thousands_separator == 1 ? 'selected' : '' %> ><%=lan.Comma%></option>
+                            <option value="2" <%= general.thousands_separator == 2 ? 'selected' : '' %> ><%=lan.Full_Stop%></option>
+                            <option value="3" <%= general.thousands_separator == 3 ? 'selected' : '' %> ><%=lan.Apostrophe%></option>
+                            <option value="4" <%= general.thousands_separator == 4 ? 'selected' : '' %> ><%=lan.None%></option>
+                            <option value="5" <%= general.thousands_separator == 5 ? 'selected' : '' %> ><%=lan.Space%></option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label class="col-form-label"><%=lan.Google%> <%=lan.Map%> <%=lan.Key%></label>
+                        <input class="form-control" type="text" name="google_map_key" value="<%= general.google_map_key %>" placeholder="<%=lan.Enter%> <%=lan.Google%> <%=lan.Map%> <%=lan.Key%>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label class="col-form-label"><%=lan.Ride%> <%=lan.Acceptance%> <%=lan.Radius%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Maximum distance (in KM) within which drivers can receive new ride booking requests."></i></label>
+                        <input class="form-control" type="number" step="any" name="ride_radius" value="<%=general.ride_radius%>" placeholder="<%=lan.Enter%> <%=lan.Ride%> <%=lan.Acceptance%> <%=lan.Radius%>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                        <label class="col-form-label"><%=lan.Show%> <%=lan.Nearby%> <%=lan.Vehicle%> <%=lan.Radius%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Search radius (in KM) for displaying nearby drivers on the customer map."></i></label>
+                        <input class="form-control" type="number" step="any" name="vehicle_radius" value="<%=general.vehicle_radius%>" placeholder="<%=lan.Enter%> <%=lan.Show%> <%=lan.Nearby%> <%=lan.Vehicle%> <%=lan.Radius%>" required>
+                    </div>
+
+                    <hr class="mt-4 mb-4">
+                    <div class="col-12 form-group">
+                      <div class="p-4 mb-4 rounded" style="background-color: #fcfdfe; border: 1px solid #eef0f3; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                        <h5 class="mb-4 text-primary" style="font-size: 15px; font-weight: 600; letter-spacing: 0.5px;">
+                          <i class="fa fa-sliders-h" style="margin-right: 8px;"></i><%=lan.Driver%> <%=lan.Detail%>: <%=lan.Service%> (<%=lan.Module%>) <%=lan.Enable%>/<%=lan.Disable%>
+                        </h5>
+                        <div class="row">
+                          
+                          <!-- Outstation Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="outstation" <%= general.outstation == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer;"><%=lan.Outstation%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle availability of Outstation (inter-city) booking service."></i></label>
+                          </div>
+
+                          <!-- Rental Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="rental" <%= general.rental == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer;"><%=lan.Rental%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle availability of Rental (hourly/daily package) booking service."></i></label>
+                          </div>
+
+                          <!-- Package Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="package" <%= general.package == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer;"><%=lan.Package%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle availability of Package Delivery (cargo courier) booking service."></i></label>
+                          </div>
+
+                          <!-- Schedule Ride Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="schedule_ride" <%= general.schedule_ride == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer;"><%=lan.Schedule_Ride%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle availability of advance scheduled ride bookings."></i></label>
+                          </div>
+
+                          <!-- Driver Approve Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="def_driver" <%= general.def_driver == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer;"><%=lan.Driver%> <%=lan.Approve%> <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="If enabled, newly registered drivers must be manually approved by an administrator before going online."></i></label>
+                          </div>
+
+                          <!-- Show Socket status banner Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="socket_status_banner" <%= general.socket_status_banner == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer; line-height: 1.2;">Show Socket Banner <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Show a persistent connection status banner to debug driver socket connection health."></i></label>
+                          </div>
+
+                          <!-- Auto Approve Zone Switch -->
+                          <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex align-items-center">
+                            <div class="icon-state switch-outline">
+                              <label class="switch m-0">
+                                <input type="checkbox" name="auto_approve_zone" <%= general.auto_approve_zone == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                            <label class="col-form-label m-0 f-w-500" style="padding-left: 12px; cursor: pointer; line-height: 1.2;">Auto Approve Zones <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="If enabled, zone price and boundary updates are automatically active without admin approval."></i></label>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>   
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Minimum Wallet Balance for Payout Withdrawals (<span class="invosymbol"></span>) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Minimum wallet balance required for drivers to request a bank payout withdrawal."></i></label>
+                      <input class="form-control" type="number" step="any" name="s_min_withdraw" value="<%=general.s_min_withdraw%>" placeholder="<%=lan.Enter%> <%=lan.Wallet_Min_Balance_For_Withdraw%>" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Minutes Before Scheduled Pick-up to Dispatch <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Number of minutes before an advance scheduled ride's pickup time that the automatic driver matching begins."></i></label>
+                      <input class="form-control" type="number" name="schedule_ride_minutes" value="<%=general.schedule_ride_minutes%>" placeholder="Enter minutes (e.g. 15)" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Wallet Low Balance Warning Limit (<span class="invosymbol"></span>) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Threshold wallet balance below which a driver receives low balance alerts and is blocked from accepting non-cash bookings."></i></label>
+                      <input class="form-control" type="number" step="any" name="wallet_low_balance_limit" value="<%=general.wallet_low_balance_limit || '50.00'%>" placeholder="Enter low balance limit warning threshold" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Call Masking Status <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle call masking to hide and protect personal phone numbers of drivers and customers."></i></label>
+                      <select class="js-example-basic-single" name="call_masking_status" id="call_masking_status" required>
+                        <option value="0" <%= general.call_masking_status == 0 ? 'selected' : '' %>>Disable</option>
+                        <option value="1" <%= general.call_masking_status == 1 ? 'selected' : '' %>>Enable</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Active Call Masking Provider <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Select the integrated VoIP service provider used to connect masked phone calls."></i></label>
+                      <select class="js-example-basic-single" name="active_call_provider" id="active_call_provider" required>
+                        <option value="twilio" <%= general.active_call_provider == 'twilio' ? 'selected' : '' %>>Twilio</option>
+                        <option value="plivo" <%= general.active_call_provider == 'plivo' ? 'selected' : '' %>>Plivo</option>
+                        <option value="exotel" <%= general.active_call_provider == 'exotel' ? 'selected' : '' %>>Exotel</option>
+                        <option value="sinch" <%= general.active_call_provider == 'sinch' ? 'selected' : '' %>>Sinch</option>
+                        <option value="vonage" <%= general.active_call_provider == 'vonage' ? 'selected' : '' %>>Vonage</option>
+                        <option value="enablex" <%= general.active_call_provider == 'enablex' ? 'selected' : '' %>>EnableX</option>
+                        <option value="myoperator" <%= general.active_call_provider == 'myoperator' ? 'selected' : '' %>>MyOperator</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Emergency Services Dial Number <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The local emergency hotline number (e.g. 911, 112) dialed by the mobile app when a user triggers SOS."></i></label>
+                      <input class="form-control" type="text" name="emergency_contact_number" value="<%= general.emergency_contact_number || '112' %>" placeholder="Enter emergency phone number (e.g. 112, 911)" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Major Route Deviation Threshold (Meters) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Maximum allowed distance deviation from planned route in meters before raising a status flag."></i></label>
+                      <input class="form-control" type="number" step="any" name="major_deviation_distance" value="<%= general.major_deviation_distance || 500 %>" placeholder="Enter deviation distance in meters" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">High-Risk Route Deviation Threshold (Meters) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Critical deviation distance in meters that triggers safety alert notifications."></i></label>
+                      <input class="form-control" type="number" step="any" name="high_risk_deviation_distance" value="<%= general.high_risk_deviation_distance || 1000 %>" placeholder="Enter critical high-risk distance in meters" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Default Client Payment Method <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The default payment option pre-selected for new customers upon sign-up."></i></label>
+                      <select class="js-example-basic-single dricheck" name="dpayment" required>
+                        <option value selected disabled><%=lan.Select%> <%=lan.Default%> <%=lan.Payment%></option>
+                        <% payment_list.forEach((data) => { %>
+                          <option value="<%= data.id %>" <%= general.default_payment == data.id ? 'selected' : '' %>><%= data.name %></option>
+                        <% }) %>
+                      </select>
+                    </div>
+
+
+
+
+                                            <hr class="mt-4">
+                    <h5 class="pb-2"><%= lan.vehicle_ride_details %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Number of Minutes for Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The number of minutes a driver will wait for free after arriving at the pickup location before waiting charges start accumulating."></i></label>
+                      <input class="form-control" type="number" step="any" name="driver_wait_time" value="<%=general.driver_wait_time%>" placeholder="<%=lan.enter_no_of_min_for_free_wait%>" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Per-Minute Charge After Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The per-minute price charged to the customer after the free wait time expires."></i></label>
+                      <input class="form-control" type="number" step="any" name="driver_wait_price" value="<%=general.driver_wait_price%>" placeholder="<%=lan.enter_free_wait_time_after_per_minute_price%>" required>
+                    </div>
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Increment Value <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The fixed price step value added when a driver increases their bid offer during negotiation."></i></label>
+                          <input class="form-control" type="number" step="any" name="dri_offer_increment" value="<%=general.dri_offer_increment%>" placeholder="<%=lan.enter_driver_offer_increment_counter%>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds that a ride offer remains visible and active to a driver before automatically expiring."></i></label>
+                          <input class="form-control" type="number" step="any" name="offer_time" value="<%=general.offer_time%>" placeholder="<%=lan.enter_offer_expired_time_driver%>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Customer Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds before a customer's ride request/offer is canceled or times out."></i></label>
+                          <input class="form-control" type="number" step="any" name="offer_expire_time" value="<%=general.offer_expire_time%>" placeholder="<%=lan.enter_complete_offer_expired_time_customer%>" required>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                          <label class="col-form-label">Immediate Ride Expiration (Minutes) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The number of minutes after which an unanswered immediate/on-demand request is deleted from the system."></i></label>
+                          <input class="form-control" type="number" step="1" name="immediate_request_expire_minutes" value="<%=general.immediate_request_expire_minutes !== undefined && general.immediate_request_expire_minutes !== null ? general.immediate_request_expire_minutes : 10%>" placeholder="Enter immediate ride expiration minutes" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                          <label class="col-form-label">Scheduled Ride Expiration (Minutes) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The number of minutes past the scheduled departure time after which a scheduled request is deleted from the system."></i></label>
+                          <input class="form-control" type="number" step="1" name="scheduled_request_expire_minutes" value="<%=general.scheduled_request_expire_minutes !== undefined && general.scheduled_request_expire_minutes !== null ? general.scheduled_request_expire_minutes : 15%>" placeholder="Enter scheduled ride expiration minutes" required>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= module[0].name %> <%= lan.ride_details %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Number of Minutes for Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The number of minutes a driver will wait for free after arriving at the pickup location before waiting charges start accumulating."></i></label>
+                      <input class="form-control" type="number" step="any" name="out_no_min_free_wait" value="<%=general.out_no_min_free_wait%>" placeholder="<%=lan.enter_no_of_min_for_free_wait%>" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Per-Minute Charge After Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The per-minute price charged to the customer after the free wait time expires."></i></label>
+                      <input class="form-control" type="number" step="any" name="out_after_min_wait_price" value="<%=general.out_after_min_wait_price%>" placeholder="<%=lan.enter_free_wait_time_after_per_minute_price%>" required>
+                    </div>
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Increment Value <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The fixed price step value added when a driver increases their bid offer during negotiation."></i></label>
+                          <input class="form-control" type="number" step="any" name="out_tot_offer_increment" value="<%=general.out_tot_offer_increment%>" placeholder="<%=lan.enter_driver_offer_increment_counter%>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds that a ride offer remains visible and active to a driver before automatically expiring."></i></label>
+                          <input class="form-control" type="number" step="any" name="out_offer_exprie_time_cus" value="<%=general.out_offer_exprie_time_cus%>" placeholder="<%=lan.enter_offer_expired_time_driver%>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Customer Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds before a customer's ride request/offer is canceled or times out."></i></label>
+                          <input class="form-control" type="number" step="any" name="out_offer_exprie_time_dri" value="<%=general.out_offer_exprie_time_dri%>" placeholder="<%=lan.enter_complete_offer_expired_time_customer%>" required>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= module[1].name %> <%= lan.ride_details %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Number of Minutes for Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The number of minutes a driver will wait for free after arriving at the pickup location before waiting charges start accumulating."></i></label>
+                      <input class="form-control" type="number" step="any" name="ren_no_min_free_wait" value="<%=general.ren_no_min_free_wait%>" placeholder="<%=lan.enter_no_of_min_for_free_wait%>" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Per-Minute Charge After Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The per-minute price charged to the customer after the free wait time expires."></i></label>
+                      <input class="form-control" type="number" step="any" name="ren_after_min_wait_price" value="<%=general.ren_after_min_wait_price%>" placeholder="<%=lan.enter_free_wait_time_after_per_minute_price%>" required>
+                    </div>
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Increment Value <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The fixed price step value added when a driver increases their bid offer during negotiation."></i></label>
+                          <input class="form-control" type="number" step="any" name="ren_tot_offer_increment" value="<%=general.ren_tot_offer_increment%>" placeholder="<%=lan.enter_driver_offer_increment_counter%>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds that a ride offer remains visible and active to a driver before automatically expiring."></i></label>
+                          <input class="form-control" type="number" step="any" name="ren_offer_exprie_time_cus" value="<%=general.ren_offer_exprie_time_cus%>" placeholder="<%=lan.enter_offer_expired_time_driver%>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Customer Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds before a customer's ride request/offer is canceled or times out."></i></label>
+                          <input class="form-control" type="number" step="any" name="ren_offer_exprie_time_dri" value="<%=general.ren_offer_exprie_time_dri%>" placeholder="<%=lan.enter_complete_offer_expired_time_customer%>" required>
+                        </div>
+                      </div>
+                    </div>
+
+
+
+
+                                            <hr class="mt-4">
+                    <h5 class="pb-2"><%= module[2].name %> <%= lan.ride_details %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Number of Minutes for Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The number of minutes a driver will wait for free after arriving at the pickup location before waiting charges start accumulating."></i></label>
+                      <input class="form-control" type="number" step="any" name="pack_no_min_free_wait" value="<%=general.pack_no_min_free_wait%>" placeholder="<%= lan.enter %> <%= lan.no_of_min %>. <%= lan.for_free_wait %>" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Per-Minute Charge After Free Wait <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The per-minute price charged to the customer after the free wait time expires."></i></label>
+                      <input class="form-control" type="number" step="any" name="pack_after_min_wait_price" value="<%=general.pack_after_min_wait_price%>" placeholder="<%= lan.enter %> <%= lan.free_wait_time_after_per_minute_price %>" required>
+                    </div>
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Increment Value <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The fixed price step value added when a driver increases their bid offer during negotiation."></i></label>
+                          <input class="form-control" type="number" step="any" name="pack_tot_offer_increment" value="<%=general.pack_tot_offer_increment%>" placeholder="<%= lan.enter %> <%= lan.driver %> <%= lan.offer %> <%= lan.increment %> <%= lan.counter %>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Driver Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds that a ride offer remains visible and active to a driver before automatically expiring."></i></label>
+                          <input class="form-control" type="number" step="any" name="pack_offer_exprie_time_cus" value="<%=general.pack_offer_exprie_time_cus%>" placeholder="<%= lan.enter %> <%= lan.offer %> <%= lan.expired %> <%= lan.time_in_second %>" required>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 form-group">
+                          <label class="col-form-label">Customer Offer Expiration Time (Seconds) <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="The duration in seconds before a customer's ride request/offer is canceled or times out."></i></label>
+                          <input class="form-control" type="number" step="any" name="pack_offer_exprie_time_dri" value="<%=general.pack_offer_exprie_time_dri%>" placeholder="<%= lan.enter %> <%= lan.complete %> <%= lan.offer %> <%= lan.expired %> <%= lan.time_in_second %>" required>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= lan.customer %> <%= lan.sign_up %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Signup Credit <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Welcome promo credit gifted to new customers upon sign-up."></i></label>
+                      <input class="form-control" type="number" step="any" name="signup_credit" value="<%=general.signup_credit%>" placeholder="<%= lan.enter %> <%= lan.signup %> <%= lan.credit %>" required>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Referral Credit <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Promo credit rewarded to a customer when a referred user signs up and completes a ride."></i></label>
+                      <input class="form-control" type="number" step="any" name="refer_credit" value="<%=general.refer_credit%>" placeholder="<%= lan.enter %> <%= lan.refer %> <%= lan.credit %>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <div class="row">
+                        <label class="col-form-label">Default Commission Rate <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Default platform commission rate applied to standard rides."></i></label>
+                        <div class="col-sm-6 col-md-8 col-lg-8 col-xl-8">
+                          <input class="form-control" type="number" step="any" name="commission_rate" value="<%=general.commission_rate%>" placeholder="<%= lan.enter %> <%= lan.commission %> <%= lan.rate %>" required>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-lg-4 col-xl-4 d-flex">
+                          <div class="col-4">
+                            <input class="form-control" type="text" placeholder="<%= lan.fix %>" readonly>
+                          </div>
+                          <div class="col-4 text-center">
+                            <div class="icon-state switch-outline" style="padding-top: 6px;">
+                              <label class="switch">
+                                <input type="checkbox" name="commisiion_type" <%= general.commisiion_type == '%' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="col-4">
+                            <input class="form-control" type="text" placeholder="%" readonly>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <div class="row">
+                        <label class="col-form-label">Weather Surcharge / Adjustment <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Additional fee/surcharge added to standard fares during bad weather conditions."></i></label>
+                        <div class="col-sm-6 col-md-8 col-lg-8 col-xl-8">
+                          <input class="form-control" type="number" step="any" name="weather_price" value="<%=general.weather_price%>" placeholder="<%= lan.enter %> <%= lan.weather %> <%= lan.change %>" required>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-lg-4 col-xl-4 d-flex">
+                          <div class="col-4">
+                            <input class="form-control" type="text" placeholder="<%= lan.fix %>" readonly>
+                          </div>
+                          <div class="col-4 text-center">
+                            <div class="icon-state switch-outline" style="padding-top: 6px;">
+                              <label class="switch">
+                                <input type="checkbox" name="weather_type" <%= general.weather_type == '%' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="col-4">
+                            <input class="form-control" type="text" placeholder="%" readonly>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= lan.one %> <%= lan.signal %> <%= lan.detail %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">OneSignal App ID <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="OneSignal Application ID used for pushing mobile notifications."></i></label>
+                      <input class="form-control" type="text" name="one_app_id" value="<%= general.one_app_id %>" placeholder="<%= lan.enter %> <%= lan.app %> <%= lan.id %>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">OneSignal REST API Key <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="OneSignal REST API Key used to authenticate notification push requests."></i></label>
+                      <input class="form-control" type="text" name="one_api_key" value="<%= general.one_api_key %>" placeholder="<%= lan.enter %> <%= lan.api %> <%= lan.key %>" required>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Web OneSignal App ID <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="OneSignal Application ID used for pushing web notifications."></i></label>
+                      <input class="form-control" type="text" name="web_one_app_id" value="<%= general.web_one_app_id || '' %>" placeholder="Enter Web App ID">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Web OneSignal REST API Key <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="OneSignal REST API Key used to authenticate web notification push requests."></i></label>
+                      <input class="form-control" type="text" name="web_one_api_key" value="<%= general.web_one_api_key || '' %>" placeholder="Enter Web REST API Key">
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= lan.select %> <%= lan.sms %> <%= lan.type %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">OTP Auto-Fill for Apps <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Enable SMS OTP auto-fill hash in outbound text messages for Android auto-verification."></i></label>
+                      <div class="media-body text-start icon-state">
+                        <label class="switch">
+                          <input type="checkbox" name="otp_autofill_status" <%= general.otp_autofill_status == '1' ? 'checked' : '' %>><span class="switch-state bg-success"></span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="form-label">Active SMS Gateway Provider <i class="fa fa-info-circle f-16 m-l-5" style="cursor: pointer; opacity: 0.7;" data-bs-toggle="tooltip" data-bs-placement="top" title="Select the default SMS gateway provider for sending verification OTP codes."></i></label>
+                      <select class="form-control wide" name="smstype" required> 
+                        <option value selected disabled><%= lan.select %> <%= lan.sms %> <%= lan.type %></option>
+                        <option value="1" <%= general.sms_type == 1 ? 'selected' : '' %> ><%= lan.msg91 %></option>
+                        <option value="2" <%= general.sms_type == 2 ? 'selected' : '' %> ><%= lan.twilio %></option>
+                        <option value="3" <%= general.sms_type == 3 ? 'selected' : '' %> >2Factor</option>
+                        <option value="4" <%= general.sms_type == 4 ? 'selected' : '' %> ><%= lan.no_auth %></option>
+                        <option value="5" <%= general.sms_type == 5 ? 'selected' : '' %> >Plivo</option>
+                        <option value="6" <%= general.sms_type == 6 ? 'selected' : '' %> >Vonage</option>
+                        <option value="7" <%= general.sms_type == 7 ? 'selected' : '' %> >Telnyx</option>
+                      </select>
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= lan.msg91 %> <%= lan.sms %> <%= lan.verification %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label"><%= lan.msg91 %> <%= lan.auth %> <%= lan.key %></label>
+                      <input class="form-control" type="text" name="msgkey" value="<%= general.msg_key %>" placeholder="<%= lan.enter %> <%= lan.auth %> <%= lan.key %>">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label"><%= lan.msg91 %> <%= lan.otp %> <%= lan.template %> <%= lan.id %></label>
+                      <input class="form-control" type="text" name="msgid" value="<%= general.msg_token %>" placeholder="<%= lan.enter %> <%= lan.otp %> <%= lan.template %> <%= lan.id %>">
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2"><%= lan.twilio %> <%= lan.sms %> <%= lan.verification %></h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label"><%= lan.twilio %> <%= lan.account %> <%= lan.sid %></label>
+                      <input class="form-control" type="text" name="twisid" value="<%= general.twilio_sid %>" placeholder="<%= lan.enter %> <%= lan.account %> <%= lan.sid %>">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label"><%= lan.twilio %> <%= lan.auth %> <%= lan.token %></label>
+                      <input class="form-control" type="text" name="twitoken" value="<%= general.twilio_token %>" placeholder="<%= lan.enter %> <%= lan.auth %> <%= lan.token %>">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label"><%= lan.twilio %> <%= lan.phone %> <%= lan.number %></label>
+                      <input class="form-control" type="text" name="twipnumber" value="<%= general.twilio_phoneno %>" placeholder="<%= lan.enter %> <%= lan.phone %> <%= lan.number %>">
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2">2Factor SMS Verification</h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">2Factor API Key</label>
+                      <input class="form-control" type="text" name="twofactor_key" value="<%= general.twofactor_key %>" placeholder="Enter 2Factor API Key">
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2">Plivo SMS Verification</h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Plivo Auth ID</label>
+                      <input class="form-control" type="text" name="plivo_auth_id" value="<%= general.plivo_auth_id %>" placeholder="Enter Plivo Auth ID">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Plivo Auth Token</label>
+                      <input class="form-control" type="text" name="plivo_auth_token" value="<%= general.plivo_auth_token %>" placeholder="Enter Plivo Auth Token">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Plivo Sender ID / Source Number</label>
+                      <input class="form-control" type="text" name="plivo_sender_id" value="<%= general.plivo_sender_id %>" placeholder="Enter Plivo Sender ID">
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2">Vonage (Nexmo) SMS Verification</h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Vonage API Key</label>
+                      <input class="form-control" type="text" name="vonage_key" value="<%= general.vonage_key %>" placeholder="Enter Vonage API Key">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Vonage API Secret</label>
+                      <input class="form-control" type="text" name="vonage_secret" value="<%= general.vonage_secret %>" placeholder="Enter Vonage API Secret">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Vonage Sender ID</label>
+                      <input class="form-control" type="text" name="vonage_sender_id" value="<%= general.vonage_sender_id %>" placeholder="Enter Vonage Sender ID (e.g. Vonage)">
+                    </div>
+
+                    <hr class="mt-4">
+                    <h5 class="pb-2">Telnyx SMS Verification</h5>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Telnyx API Key</label>
+                      <input class="form-control" type="text" name="telnyx_key" value="<%= general.telnyx_key %>" placeholder="Enter Telnyx API Key">
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 form-group">
+                      <label class="col-form-label">Telnyx Sender Phone / Profile ID</label>
+                      <input class="form-control" type="text" name="telnyx_phone" value="<%= general.telnyx_phone %>" placeholder="Enter Telnyx Phone Number (e.g. +18005550199)">
+                    </div>
+
+                    </div>
+                    <% let permissions = per != "1" ? per.setting[1] : "1" %>
+                    <% if(permissions == "1"){ %>
+                    <div class="text-end mt-5">
+                      <button class="btn btn-square btn-primary btn-air-primary add_detail_btn b-r-10" type="submit"><%= lan.submit %></button> 
+                    </div>
+                    <% } %>
+                    </form>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+        <%- include('./partials/footer'); -%>
+        <%- include('./partials/script'); -%>
+  </body>
+</html>

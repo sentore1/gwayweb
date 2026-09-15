@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+    <style>
+      :root {
+    --building-color: #FF9800;
+    --house-color: #0288D1;
+    --shop-color: #7B1FA2;
+    --warehouse-color: #558B2F;
+    }
+    
+
+
+    /*
+    * Property styles in unhighlighted state.
+    */
+    .property {
+    align-items: center;
+    border-radius: 50%;
+    color: #263238;
+    display: flex;
+    font-size: 14px;
+    gap: 15px;
+    height: 30px;
+    justify-content: center;
+    padding: 4px;
+    position: relative;
+    position: relative;
+    transition: all 0.3s ease-out;
+    width: 30px;
+    }
+
+    .property::after {
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    content: "";
+    height: 0;
+    left: 50%;
+    position: absolute;
+    top: 95%;
+    transform: translate(-50%, 0);
+    transition: all 0.3s ease-out;
+    width: 0;
+    z-index: 1;
+    }
+
+    .property .icon {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    color: #FFFFFF;
+    }
+
+    .property .icon svg {
+    height: 20px;
+    width: auto;
+    }
+
+    .property .details {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    }
+
+    .property .address {
+    color: #636363;
+    font-size: 12px;
+    margin-bottom: 3px;
+    margin-top: 0px;
+    }
+
+    .property .features {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    }
+
+    .property .features > div {
+    align-items: center;
+    background: #F5F5F5;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    display: flex;
+    font-size: 10px;
+    gap: 5px;
+    padding: 5px;
+    }
+
+    /*
+    * Property styles in highlighted state.
+    */
+    .property.highlight {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.2);
+    height: 90px;
+    padding: 8px 15px;
+    width: auto;
+    }
+
+    .property.highlight::after {
+    border-top: 9px solid #FFFFFF;
+    }
+
+    .property.highlight .details {
+    display: flex;
+    }
+
+    .property.highlight .icon svg {
+    width: 50px;
+    height: 50px;
+    }
+
+    .property .bed {
+    color: #FFA000;
+    }
+
+    .property .bath {
+    color: #03A9F4;
+    }
+
+    .property .size {
+    color: #388E3C;
+    }
+
+    /*
+    * House icon colors.
+    */
+    .property.highlight:has(.fa-house) .icon {
+    color: var(--house-color);
+    }
+
+    .property:not(.highlight):has(.fa-house) {
+    background-color: var(--house-color);
+    }
+
+    .property:not(.highlight):has(.fa-house)::after {
+    border-top: 9px solid var(--house-color);
+    }
+
+    /*
+    * Building icon colors.
+    */
+    .property.highlight:has(.fa-building) .icon {
+    color: var(--building-color);
+    }
+
+    .property:not(.highlight):has(.fa-building) {
+    background-color: var(--building-color);
+    }
+
+    .property:not(.highlight):has(.fa-building)::after {
+    border-top: 9px solid var(--building-color);
+    }
+
+    /*
+    * Warehouse icon colors.
+    */
+    .property.highlight:has(.fa-warehouse) .icon {
+    color: var(--warehouse-color);
+    }
+
+    .property:not(.highlight):has(.fa-warehouse) {
+    background-color: var(--warehouse-color);
+    }
+
+    .property:not(.highlight):has(.fa-warehouse)::after {
+    border-top: 9px solid var(--warehouse-color);
+    }
+
+    /*
+    * Shop icon colors.
+    */
+    .property.highlight:has(.fa-shop) .icon {
+    color: var(--shop-color);
+    }
+
+    .property:not(.highlight):has(.fa-shop) {
+    background-color: var(--shop-color);
+    }
+
+    .property:not(.highlight):has(.fa-shop)::after {
+    border-top: 9px solid var(--shop-color);
+    }
+    .stat-filter-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0 !important;
+        background-color: #ffffff !important;
+        position: relative;
+    }
+    .stat-filter-card.active, .stat-filter-card:hover {
+        border-top: 3px solid #4f46e5 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+        transform: translateY(-2px);
+    }
+    .stat-filter-card[data-status="online"].active, .stat-filter-card[data-status="online"]:hover {
+        border-top: 3px solid #10b981 !important;
+    }
+    .stat-filter-card[data-status="onride"].active, .stat-filter-card[data-status="onride"]:hover {
+        border-top: 3px solid #f59e0b !important;
+    }
+    .stat-filter-card[data-status="break"].active, .stat-filter-card[data-status="break"]:hover {
+        border-top: 3px solid #64748b !important;
+    }
+    .live-pulse-dot {
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        width: 10px;
+        height: 10px;
+        background-color: #10b981;
+        border: 1.5px solid #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+        animation: livePulseDot 1.4s infinite ease-in-out;
+        z-index: 999;
+    }
+    @keyframes livePulseDot {
+        0% {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+        }
+        70% {
+            transform: scale(1.15);
+            box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+        }
+        100% {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+</style>
+
+<script>window.startTime = window.startTime || function(){};</script>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3><%= lan.Driver %> <%= lan.Location %></h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><%= lan.Zone %></li>
+                    <li class="breadcrumb-item active"><%= lan.Driver %> <%= lan.Location %></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <%= lan.container_fluid_starts %>-->
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+                  <div class="card-body">
+                    <!-- Stat Bar with Click-to-Filter -->
+                    <div class="row mb-3 align-items-center g-2" id="driver-stats-bar">
+                      <div class="col">
+                        <div class="p-3 border rounded-3 stat-filter-card active" data-status="0">
+                          <div class="rounded-circle p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #e0e7ff; color: #4338ca;">
+                            <i class="fa fa-users fa-lg"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Total Drivers</small>
+                            <h4 class="mb-0 fw-bold text-dark" id="stat-total-drivers">0</h4>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="p-3 border rounded-3 stat-filter-card" data-status="live">
+                          <div class="rounded-circle p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #ccfbf1; color: #0f766e;">
+                            <i class="fa fa-bolt fa-lg"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Live Connected</small>
+                            <h4 class="mb-0 fw-bold text-dark" id="stat-live-drivers">0</h4>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="p-3 border rounded-3 stat-filter-card" data-status="online">
+                          <div class="rounded-circle p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #dcfce7; color: #15803d;">
+                            <i class="fa fa-wifi fa-lg"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Online & Ready</small>
+                            <h4 class="mb-0 fw-bold text-dark" id="stat-online-drivers">0</h4>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="p-3 border rounded-3 stat-filter-card" data-status="onride">
+                          <div class="rounded-circle p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #fef3c7; color: #b45309;">
+                            <i class="fa fa-car fa-lg"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">On Active Ride</small>
+                            <h4 class="mb-0 fw-bold text-dark" id="stat-onride-drivers">0</h4>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="p-3 border rounded-3 stat-filter-card" data-status="break">
+                          <div class="rounded-circle p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569;">
+                            <i class="fa fa-coffee fa-lg"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Break / Offline</small>
+                            <h4 class="mb-0 fw-bold text-dark" id="stat-break-drivers">0</h4>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Filter Bar (Zone, Vehicle, Status) -->
+                    <div class="row g-2 mb-2">
+                      <div class="col-sm-12 col-md-4 form-group mb-0">
+                        <label class="col-form-label fw-bold text-secondary" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;"><%= lan.Zone %> <%= lan.List %></label>
+                        <select class="js-example-basic-single" id="zonedlist" required>
+                          <option value="0" selected>All Zones</option>
+                          <% zone_data.forEach((zdata) => { %>
+                            <option value="<%= zdata.id %>"><%= zdata.name %></option>
+                          <% }) %>
+                        </select>
+                      </div>
+                      <div class="col-sm-12 col-md-4 form-group mb-0">
+                        <label class="col-form-label fw-bold text-secondary" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;"><%= lan.Vehicle %> <%= lan.List %></label>
+                        <select class="js-example-basic-single" id="zonevehicle" required>
+                          <option value="0"><%= lan.All %> <%= lan.Vehicle %></option>
+                          <% vehicle.forEach((vdata) => { %>
+                            <option value="<%= vdata.id %>"><%= vdata.name %></option>
+                          <% }) %>
+                        </select>
+                      </div>
+                      <div class="col-sm-12 col-md-4 form-group mb-0">
+                        <label class="col-form-label fw-bold text-secondary" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Driver Status</label>
+                        <select class="js-example-basic-single" id="driverstatus">
+                          <option value="0" selected>All Statuses</option>
+                          <option value="live">⚡ Live Device Ping (Connected)</option>
+                          <option value="online">🟢 Online & Ready</option>
+                          <option value="onride">🟠 On Active Ride</option>
+                          <option value="break">🩶 Break / Offline</option>
+                        </select>
+                      </div>
+                    </div>
+                      <div class="col-12 mt-2">
+                        <div id="map-canvas-edit" style="height: 75vh; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;"></div>
+                        <textarea name="zone_lat_lon" id="add_lat_lon" cols="30" rows="10" hidden></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <%= lan.container_fluid_ends %>-->
+        </div>
+
+        <!-- Classic Professional Driver Details Modal -->
+        <div class="modal fade" id="driverDetailModal" tabindex="-1" aria-labelledby="driverDetailModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+              <!-- Professional Dark Slate Header -->
+              <div class="modal-header text-white p-3" style="background: #1e293b; border-bottom: 1px solid #334155;">
+                <div class="d-flex align-items-center">
+                  <img id="modal-driver-avatar" src="" class="rounded-circle border border-2 border-white me-3" style="width: 50px; height: 50px; object-fit: cover; background: #fff;" alt="">
+                  <div>
+                    <div class="d-flex align-items-center gap-2">
+                      <h5 class="modal-title fw-bold mb-0 text-white" id="modal-driver-name" style="font-size: 17px;">Driver Name</h5>
+                      <span id="modal-status-badge-single" class="badge bg-success" style="font-size: 10px; padding: 4px 8px;">ONLINE</span>
+                      <span id="modal-live-device-badge" class="badge bg-info text-dark" style="font-size: 10px; padding: 4px 8px;"><i class="fa fa-bolt me-1"></i>LIVE DEVICE CONNECTED</span>
+                    </div>
+                    <small class="text-slate-300" id="modal-driver-phone" style="color: #94a3b8; font-size: 12px;">+91 0000000000</small>
+                  </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body p-4" style="background: #f8fafc;">
+                <div class="row g-3">
+                  <!-- Vehicle Card -->
+                  <div class="col-md-6">
+                    <div class="card h-100 border shadow-sm" style="border-radius: 10px; border-color: #e2e8f0 !important; background: #ffffff;">
+                      <div class="card-body p-3">
+                        <h6 class="fw-bold mb-3 text-dark pb-2 border-bottom" style="font-size: 13.5px; border-color: #f1f5f9 !important;"><i class="fa fa-car me-2 text-secondary"></i>Vehicle & Zone Info</h6>
+                        <div class="d-flex align-items-center mb-3">
+                          <img id="modal-vehicle-img" src="" class="rounded me-3 border p-1" style="width: 55px; height: 40px; object-fit: contain; background: #fff;" alt="">
+                          <div>
+                            <strong id="modal-vehicle-name" class="d-block text-dark" style="font-size: 14px;">Taxi</strong>
+                            <span id="modal-vehicle-number" class="badge bg-secondary text-uppercase" style="font-size: 10px;">GJ-01-XX-0000</span>
+                          </div>
+                        </div>
+                        <ul class="list-group list-group-flush small" style="font-size: 12.5px;">
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0">
+                            <span class="text-muted">Vehicle Color:</span>
+                            <strong id="modal-vehicle-color" class="text-dark">-</strong>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0">
+                            <span class="text-muted">Capacity:</span>
+                            <strong id="modal-passenger-capacity" class="text-dark">-</strong>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0">
+                            <span class="text-muted">Active Zone(s):</span>
+                            <strong id="modal-active-zones" class="text-end text-dark" style="max-width: 60%;">-</strong>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0" id="modal-pending-zone-row" style="display: none;">
+                            <span class="text-warning fw-semibold"><i class="fa fa-clock-o me-1"></i>Pending Zone:</span>
+                            <strong id="modal-pending-zones" class="text-warning text-end" style="max-width: 60%;">-</strong>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Performance Stats Card -->
+                  <div class="col-md-6">
+                    <div class="card h-100 border shadow-sm" style="border-radius: 10px; border-color: #e2e8f0 !important; background: #ffffff;">
+                      <div class="card-body p-3">
+                        <h6 class="fw-bold mb-3 text-dark pb-2 border-bottom" style="font-size: 13.5px; border-color: #f1f5f9 !important;"><i class="fa fa-bar-chart me-2 text-secondary"></i>Performance & Rating</h6>
+                        <div class="row text-center g-2 mb-3">
+                          <div class="col-6">
+                            <div class="p-2 border rounded" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                              <small class="text-muted d-block" style="font-size: 11px;">Completed Rides</small>
+                              <h5 class="fw-bold text-dark mb-0" id="modal-completed-rides">0</h5>
+                            </div>
+                          </div>
+                          <div class="col-6">
+                            <div class="p-2 border rounded" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                              <small class="text-muted d-block" style="font-size: 11px;">Driver Rating</small>
+                              <h5 class="fw-bold text-dark mb-0" id="modal-rating"><i class="fa fa-star text-warning me-1"></i>5.0</h5>
+                            </div>
+                          </div>
+                        </div>
+                        <ul class="list-group list-group-flush small" style="font-size: 12.5px;">
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0">
+                            <span class="text-muted">Total Reviews:</span>
+                            <strong id="modal-total-reviews" class="text-dark">0 reviews</strong>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0">
+                            <span class="text-muted">Wallet Balance:</span>
+                            <strong id="modal-wallet-balance" class="text-dark">$0.00</strong>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between px-0 bg-transparent py-1 border-bottom-0">
+                            <span class="text-muted">Email:</span>
+                            <span id="modal-driver-email" class="text-dark fw-medium text-truncate" style="max-width: 60%;">driver@gmail.com</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Professional Active Ride Card -->
+                  <div class="col-12" id="modal-active-ride-card" style="display: none;">
+                    <div class="card border shadow-sm" style="border-radius: 10px; border-color: #fde68a !important; background: #fffdf5; border-left: 4px solid #f59e0b !important;">
+                      <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <h6 class="fw-bold text-dark mb-0" style="font-size: 13px;"><i class="fa fa-circle-o-notch fa-spin me-2 text-warning"></i>Current Running Ride</h6>
+                          <div class="d-flex align-items-center gap-2">
+                            <a id="modal-ride-track-btn" href="#" target="_blank" class="badge bg-success text-white" style="font-size: 10px; text-decoration: none;"><i class="fa fa-map-marker me-1"></i>Track Live</a>
+                            <span class="badge bg-warning text-dark" id="modal-ride-status" style="font-size: 10px;">ON RIDE</span>
+                          </div>
+                        </div>
+                        <div class="small" style="font-size: 12px; color: #334155;">
+                          <div class="mb-1"><strong>Customer:</strong> <span id="modal-ride-customer" class="text-dark fw-semibold">-</span></div>
+                          <div class="mb-1 text-truncate"><strong>📍 Pickup:</strong> <span id="modal-ride-pickup" class="text-secondary">-</span></div>
+                          <div class="text-truncate"><strong>🏁 Destination:</strong> <span id="modal-ride-drop" class="text-secondary">-</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Unified Modal Footer -->
+              <div class="modal-footer bg-white border-top p-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Close</button>
+                <div>
+                  <a id="modal-call-btn" href="" class="btn btn-outline-primary me-2 px-3"><i class="fa fa-phone me-1"></i> Call Driver</a>
+                  <a id="modal-profile-link" href="#" target="_blank" class="btn btn-primary px-3" style="background: #4f46e5; border-color: #4f46e5;"><i class="fa fa-user me-1"></i> View Full Profile</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%- include('./partials/footer'); -%>
+        <%- include('./partials/script'); -%>
+        <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=<%= general.google_map_key %>&libraries=places"></script>
+        <script src="../../js/mcx-drawing-polyfill.js"></script>
+        <script src="../../js/map_driver_location.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../socket_function.js"></script>
+        <script>
+            window.addEventListener('load', function() {
+                if (typeof initMap === 'function') {
+                    initMap();
+                }
+            });
+        </script>
+  </body>
+</html>

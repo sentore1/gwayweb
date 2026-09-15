@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+    <style>
+        .hand-hover {
+          cursor: pointer;
+        }
+    </style>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+    <!-- Page Sidebar Ends-->
+    <div class="page-body">
+      <div class="container-fluid">
+        <div class="page-title">
+          <div class="row">
+            <div class="col-sm-6">
+              <h3><%=lan.cash%> <%=lan.management%></h3>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                <li class="breadcrumb-item"><%=lan.dashboard%></li>
+                <li class="breadcrumb-item active"><%=lan.cash%> <%=lan.management%></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Container-fluid starts-->
+      <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive theme-scrollbar">
+                            <table class="display" id="basic-1">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th><%=lan.driver%> <%=lan.name%></th>
+                                        <th><%=lan.payment%> <%=lan.image%></th>
+                                        <th><%=lan.amount%></th>
+                                        <th><%=lan.payment%> <%=lan.method%></th>
+                                        <th><%=lan.date%></th>
+                                        <th><%=lan.status%></th>
+                                        <th><%=lan.action%></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% var i = 1 %>
+                                    <% cash_list.forEach((data) => { %>
+                                        <tr class="acashmtr">
+                                            <td><%= i %></td>
+                                            <td><%= data.first_name %> <%= data.last_name %></td>
+                                            <td class="p-1">
+                                                <a href="../../<%= data.prof_image %>" onclick="openLightbox(this.href); return false;"><img class="p-0" width="50px" height="50px" src="../../<%= data.prof_image %>" alt="<%=lan.image%>" onerror="this.src='../../images/dashboard/default/profile.png'"></a>
+                                            </td>
+                                            <td class="invosymbol"><%= data.amount %></td>
+                                            <td><%= data.payment_type %></td>
+                                            <td><%= data.date %></td>
+                                            <td class="acasstatus">
+                                                <% if (data.status == '0') { %>
+                                                    <span class="badge badge-secondary"><%=lan.pending%></span>
+                                                <% } else if (data.status == '1') { %>
+                                                    <span class="badge badge-success"><%=lan.approve%></span>
+                                                <% } else if (data.status == '2') { %>
+                                                    <span class="badge badge-danger"><%=lan.reject%></span>
+                                                <% } else { %>
+                                                    -
+                                                <% }; %>
+                                            </td>
+                                            <td class="acasmain">
+                                                <% if (data.status == '0') { %>
+                                                    <span class="badge badge-success hand-hover" id="alcasappro" data-id="<%= data.id %>"><%=lan.approve%></span>
+                                                    <span class="badge badge-danger hand-hover" id="alcasateject" data-id="<%= data.id %>"><%=lan.reject%></span>
+                                                <% } else { %>
+                                                    -
+                                                <% }; %>
+                                            </td>
+                                        </tr>
+                                    <% i++ %>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <!-- Container-fluid Ends-->
+    </div>
+
+    <div class="modal fade" id="edit_cash" tabindex="-1" role="dialog" aria-labelledby="edit_cash" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><%=lan.edit%> <%=lan.cash%> <%=lan.amount%></h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="<%=lan.close%>"></button>
+                </div>
+                <form class="needs-validation" id="edit_cash_form" novalidate="" action="" method="post">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label"><%=lan.cash%> <%=lan.amount%></label>
+                                <input class="form-control" id="cash_amount_input" name="cash_amount" type="number" step="any" value="<%=lan.cash%> <%=lan.amount%>">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal"><%=lan.close%></button>
+                        <button class="btn btn-primary" type="submit"><%=lan.update%></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit_cash_status_module" tabindex="-1" role="dialog" aria-labelledby="edit_cash_status_module" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><%=lan.edit%> <%=lan.cash%> <%=lan.status%></h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="<%=lan.close%>"></button>
+                </div>
+                <form class="needs-validation" id="cash_edit_status_form" novalidate="" action="" method="post">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12 text-center">
+                                <a id="edit_cash_imga" href="" target="_blank"><img class="p-0" id="edit_cash_img" width="100px" height="100px" src="" alt="<%=lan.image%>"></a>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <h5><%=lan.payment%> <%=lan.method%> :- <span class="f-w-400 cash_pm"></span></h5>
+                            </div>
+
+                            <div class="col-12 mt-1">
+                                <h5><%=lan.date%> :- <span class="f-w-400 cash_date"></span></h5>
+                            </div>
+
+                            <div class="col-12 mt-1">
+                                <h5><%=lan.amount%> :- <span class="f-w-400 cash_amount"></span></h5>
+                            </div>
+
+                            <div class="col-12 mt-1 d-flex">
+                                <label class="col-form-label m-r-10"><%=lan.status%></label>
+                                <div class="icon-state switch-outline">
+                                    <label class="switch">
+                                        <input type="checkbox" id="cash_status" name="cash_status"><span class="switch-state bg-success"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal"><%=lan.close%></button>
+                        <button class="btn btn-primary" type="submit"><%=lan.save%></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+        <!-- Lightbox Modal for Document/Receipt Preview -->
+        <div class="modal fade" id="imageLightboxModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1070;">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content" style="background-color: rgba(15, 23, 42, 0.95); border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+                    <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 25px;">
+                        <h5 class="modal-title" style="color: #fff; font-weight: 600; font-family: 'Montserrat', sans-serif;">Document Preview</h5>
+                        <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-column align-items-center justify-content-center" style="position: relative; min-height: 500px; padding: 25px; background: radial-gradient(circle, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%);">
+                        <!-- Image Wrapper with Zoom / Pan / Rotation -->
+                        <div id="lightboxImageWrapper" style="display: flex; align-items: center; justify-content: center; max-width: 100%; max-height: 65vh; transition: all 0.3s ease;">
+                            <img id="lightboxImage" src="" alt="Document Preview" style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);">
+                        </div>
+                        
+                        <!-- Floating Controls Toolbar -->
+                        <div class="d-flex gap-3 mt-4 px-4 py-2" style="background: rgba(30, 41, 59, 0.7); border-radius: 50px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                            <button type="button" class="btn rounded-circle control-btn" id="btnZoomIn" title="Zoom In">
+                                <i class="fa fa-search-plus"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnZoomOut" title="Zoom Out">
+                                <i class="fa fa-search-minus"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnRotateLeft" title="Rotate Left 90°">
+                                <i class="fa fa-undo"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnRotateRight" title="Rotate Right 90°">
+                                <i class="fa fa-repeat"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnReset" title="Reset View">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentRotation = 0;
+            let currentZoom = 1;
+
+            function openLightbox(imageSrc) {
+                if (!imageSrc || imageSrc.includes('profile.png')) return;
+                currentRotation = 0;
+                currentZoom = 1;
+                updateTransform();
+                $('#lightboxImage').attr('src', imageSrc);
+                var myModal = new bootstrap.Modal(document.getElementById('imageLightboxModal'));
+                myModal.show();
+            }
+
+            function updateTransform() {
+                $('#lightboxImage').css('transform', `rotate(${currentRotation}deg) scale(${currentZoom})`);
+            }
+
+            $(document).ready(function() {
+                // Lightbox toolbar buttons
+                $('#btnZoomIn').on('click', function() {
+                    currentZoom = Math.min(3, currentZoom + 0.25);
+                    updateTransform();
+                });
+
+                $('#btnZoomOut').on('click', function() {
+                    currentZoom = Math.max(0.5, currentZoom - 0.25);
+                    updateTransform();
+                });
+
+                $('#btnRotateLeft').on('click', function() {
+                    currentRotation = (currentRotation - 90) % 360;
+                    updateTransform();
+                });
+
+                $('#btnRotateRight').on('click', function() {
+                    currentRotation = (currentRotation + 90) % 360;
+                    updateTransform();
+                });
+
+                $('#btnReset').on('click', function() {
+                    currentRotation = 0;
+                    currentZoom = 1;
+                    updateTransform();
+                });
+            });
+        </script>
+
+        <style>
+            .control-btn {
+                width: 44px;
+                height: 44px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.15) !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                transition: all 0.2s ease-in-out;
+                cursor: pointer;
+            }
+            .control-btn i {
+                color: #ffffff !important;
+                font-size: 16px;
+            }
+            .control-btn:hover {
+                background: rgba(255, 255, 255, 0.3) !important;
+                transform: scale(1.08);
+                border-color: rgba(255, 255, 255, 0.4) !important;
+            }
+            .control-btn:active {
+                transform: scale(0.95);
+            }
+        </style>
+
+<%- include('./partials/footer'); -%>
+<%- include('./partials/script'); -%>
+</body>
+</html>

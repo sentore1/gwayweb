@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>Call Masking Logs</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                            <li class="breadcrumb-item">Dashboard</li>
+                            <li class="breadcrumb-item active">Call Masking Logs</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container-fluid starts-->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <h5>Call Masking Audit Logs</h5>
+                            <span>Review and troubleshoot secure call bridge connections initiated between customers and drivers.</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Date & Time</th>
+                                            <th>Ride ID</th>
+                                            <th>Caller Details</th>
+                                            <th>Receiver Details</th>
+                                            <th>Active Provider</th>
+                                            <th>Connection Status</th>
+                                            <th>Error Log</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% let i = 1 %>
+                                        <% logs.forEach((log) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td><%= log.date %></td>
+                                                <td>#<%= log.ride_id %></td>
+                                                <td>
+                                                    <span class="badge badge-primary"><%= log.caller_type.toUpperCase() %></span>
+                                                    <br/>ID: <%= log.caller_id %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-secondary"><%= log.receiver_type.toUpperCase() %></span>
+                                                    <br/>ID: <%= log.receiver_id %>
+                                                </td>
+                                                <td><%= log.provider_name.toUpperCase() %></td>
+                                                <td>
+                                                    <% if (log.status === 'Success') { %>
+                                                        <span class="badge badge-success"><%= log.status %></span>
+                                                    <% } else { %>
+                                                        <span class="badge badge-danger"><%= log.status %></span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (log.error_message) { %>
+                                                        <span class="text-danger custom_tooltip" style="cursor: help;">View Error
+                                                            <span class="tooltiptext" style="width: 250px; margin-left: -125px; padding: 8px; font-size: 11px; bottom: 130%; text-transform: none; text-align: left; line-height: 1.4;"><%= log.error_message %></span>
+                                                        </span>
+                                                    <% } else { %>
+                                                        <span class="text-muted">-</span>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                            <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Container-fluid Ends-->
+    </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+</body>
+</html>

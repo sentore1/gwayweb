@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>Notification Templates</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                            <li class="breadcrumb-item"><%=lan.dashboard%></li>
+                            <li class="breadcrumb-item active">Notification Templates</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <h5>Manage System Notification Messages</h5>
+                            <span>Configure custom dynamic push notification titles and bodies for all 11 system events.</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Event Name</th>
+                                            <th>Key</th>
+                                            <th>Title Template</th>
+                                            <th>Message Template</th>
+                                            <th>Supported Placeholders</th>
+                                            <th><%=lan.action%></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% var i = 1 %>
+                                        <% templates.forEach((data) => { %>
+                                            <% 
+                                                let placeholders = [];
+                                                if (data.key_name === 'driver_offer') {
+                                                    placeholders = ['driver_name', 'destination', 'amount'];
+                                                } else if (data.key_name === 'ride_otp') {
+                                                    placeholders = ['otp'];
+                                                } else if (data.key_name === 'new_chat_message') {
+                                                    placeholders = ['message'];
+                                                } else if (data.key_name === 'document_approved') {
+                                                    placeholders = ['document_name'];
+                                                } else if (data.key_name === 'document_rejected') {
+                                                    placeholders = ['document_name', 'reason'];
+                                                } else if (data.key_name === 'zone_rejected') {
+                                                    placeholders = ['reason'];
+                                                } else if (data.key_name === 'payout_approved') {
+                                                    placeholders = ['amount'];
+                                                } else if (data.key_name === 'payout_rejected') {
+                                                    placeholders = ['amount', 'reason'];
+                                                } else if (data.key_name === 'cash_transfer_approved') {
+                                                    placeholders = ['amount'];
+                                                } else if (data.key_name === 'cash_transfer_rejected') {
+                                                    placeholders = ['amount', 'reason'];
+                                                } else if (data.key_name === 'payout_submitted') {
+                                                    placeholders = ['amount'];
+                                                } else if (data.key_name === 'cash_transfer_submitted') {
+                                                    placeholders = ['amount'];
+                                                }
+                                            %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td><strong><%= data.name %></strong></td>
+                                                <td><code><%= data.key_name %></code></td>
+                                                <td><%= data.title %></td>
+                                                <td><%= data.message %></td>
+                                                <td>
+                                                    <% if (placeholders.length > 0) { %>
+                                                        <% placeholders.forEach(ph => { %>
+                                                            <span class="badge rounded-pill badge-light-info text-dark">{<%= ph %>}</span>
+                                                        <% }) %>
+                                                    <% } else { %>
+                                                        <span class="text-muted">None</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <ul class="action">
+                                                        <li class="edit custom_tooltip">
+                                                            <a href="javascript:void(0)" 
+                                                               id="edit_template_btn" 
+                                                               data-bs-toggle="modal" 
+                                                               data-bs-target="#edit_template_modal"
+                                                               data-id="<%= data.id %>"
+                                                               data-title="<%= data.title %>"
+                                                               data-message="<%= data.message %>"
+                                                               data-placeholders='<%= JSON.stringify(placeholders) %>'>
+                                                                <i class="icon-pencil-alt"></i>
+                                                            </a><span class="tooltiptext" style="width: 100px; margin-left: -50px; padding: 5px; font-size: 11px; bottom: 135%;">Edit Template</span>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                            <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Template Modal -->
+    <div class="modal fade bd-example-modal-lg" id="edit_template_modal" tabindex="-1" role="dialog" aria-labelledby="edit_template_modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Notification Template</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="needs-validation" id="edit_template_form" novalidate="" action="" method="post">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Notification Title</label>
+                                <input type="text" class="form-control" id="edit_template_title" name="title" required>
+                                <div class="invalid-feedback">Please enter a template title.</div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notification Message Body</label>
+                                <textarea class="form-control" id="edit_template_message" rows="4" name="message" required></textarea>
+                                <div class="invalid-feedback">Please enter a template message body.</div>
+                            </div>
+                            <div class="col-12" id="template_placeholders_container">
+                                <!-- Placeholders will be rendered here dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on("click", "#edit_template_btn", function() {
+                const id = $(this).data("id");
+                const title = $(this).data("title");
+                const message = $(this).data("message");
+                const placeholders = $(this).data("placeholders");
+
+                $("#edit_template_form").attr("action", "/settings/edit_notification_template/" + id);
+                $("#edit_template_title").val(title);
+                $("#edit_template_message").val(message);
+
+                let phHtml = "";
+                if (placeholders && placeholders.length > 0) {
+                    phHtml += '<div class="alert alert-info mt-2 pb-2 pt-2"><p class="mb-1"><strong>Supported Placeholders:</strong></p><ul class="ps-3 mb-0">';
+                    placeholders.forEach(ph => {
+                        phHtml += '<li><code>{' + ph + '}</code></li>';
+                    });
+                    phHtml += '</ul></div>';
+                } else {
+                    phHtml += '<div class="alert alert-light mt-2 pb-2 pt-2 text-muted"><p class="mb-0">No placeholders supported for this template.</p></div>';
+                }
+                $("#template_placeholders_container").html(phHtml);
+            });
+        });
+    </script>
+</body>
+</html>

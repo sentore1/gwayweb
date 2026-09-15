@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <div class="page-body">
+      <div class="container-fluid">
+        <div class="page-title">
+          <div class="row">
+            <div class="col-sm-6">
+              <h3><%=lan.driver%> <%=lan.profile%></h3>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                <li class="breadcrumb-item"><%=lan.dashboard%></li>
+                <li class="breadcrumb-item active"><%=lan.driver%> <%=lan.profile%></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid">
+        <div class="email-wrap bookmark-wrap user-profile">
+          <div class="row">
+            <div class="col-xxl-3 col-xl-4 box-col-30">
+              <div class="md-sidebar email-sidebar"><a class="btn btn-primary md-sidebar-toggle" href="javascript:void(0)"><i class="fa fa-list"></i></a>
+                <div class="md-sidebar-aside email-left-aside">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="email-app-sidebar left-bookmark">
+                        <div class="text-center">
+                          <div class="flex-shrink-0" style="position: relative; display: inline-block; cursor: pointer;" onclick="openLightbox('../../<%=driver.profile_image%>')" title="Click to zoom image">
+                              <img class="rounded-circle" src="../../<%=driver.profile_image%>" alt="" style="width: 100px; height: 100px; border: 3px solid #eee; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: all 0.25s ease;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
+                          </div>
+                          <div class="flex-grow-1 mt-2">
+                            <h6 class="f-w-600"><a><%=driver.first_name%> <%=driver.last_name%></a></h6>
+                            <p><%=driver.email%></p>
+                            <div class="d-flex justify-content-center mt-1">
+                              <p><%=lan.wallet%> :-&nbsp;<p class="invosymbol"><%=driver.wallet%></p></p> &nbsp;&nbsp;&nbsp;&nbsp;
+                            </div>
+                            <span class="d-flex justify-content-center mt-1">
+                              <p class="p-r-20"><%=lan.total%> <%=lan.review%> :-&nbsp;<%=driver.tot_review%></p>
+                              <span class="badge badge-secondary f-12"><i class="fa fa-star"></i> <%=driver.avg_star%>/5</span>
+                            </span>
+                          </div>
+                        </div>
+                        <ul class="nav main-menu" role="tablist">
+                          <li><hr></li>
+                          <li><a class="show active" id="profile-tab" data-bs-toggle="pill" href="#profile" role="tab" aria-controls="profile" aria-selected="true"><span class="title"><%=lan.profile%></span></a></li>
+                          <li id="dpro_publish_ride" data-drid="<%=driver.id%>"><a class="show" id="publish-ride-tab" data-bs-toggle="pill" href="#publish-ride" role="tab" aria-controls="publish-ride" aria-selected="false"><span class="title"><%=lan.publish_ride%></span></a></li>
+                          <li id="dpro_my_ride" data-drid="<%=driver.id%>"><a class="show" id="my-ride-tab" data-bs-toggle="pill" href="#my-ride" role="tab" aria-controls="my-ride" aria-selected="false"><span class="title"><%=lan.my_ride%></span></a></li>
+                          <li id="dpro_wtransaction" data-drid="<%=driver.id%>"><a class="show" id="wallet-transaction-tab" data-bs-toggle="pill" href="#wallet-transaction" role="tab" aria-controls="wallet-transaction" aria-selected="false"><span class="title"><%=lan.wallet_transaction%></span></a></li>
+                          <li><a class="show" id="vehicle-detail-tab" data-bs-toggle="pill" href="#vehicle-detail" role="tab" aria-controls="vehicle-detail" aria-selected="false"><span class="title"><%=lan.vehicle_detail%></span></a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-xxl-9 col-xl-8 col-md-12 box-col-8">
+              <div class="email-right-aside bookmark-tabcontent">
+                <div class="card email-body">
+                  <div class="ps-0">
+                    <div class="tab-content">
+                      <div class="tab-pane fade active show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="card mb-0">
+                          <div class="card-header d-flex">
+                            <h4 class="mb-0"><%=lan.driver_profile%></h4>
+                          </div>
+                          <div class="card-body ">
+                            <div class="details-bookmark text-center">
+                              <div class="row" id="bookmarkData">
+                                <div class="col-12 mb-4 text-center">
+                                  <div class="image-preview-container" style="position: relative; display: inline-block; cursor: pointer; transition: all 0.25s ease;" onclick="openLightbox('../../<%=driver.profile_image%>')" title="Click to zoom image">
+                                      <img class="me-3 img-thumbnail" src="../../<%=driver.profile_image%>" alt="" style="width: 160px; height: 160px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.25s ease;" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='scale(1)';">
+                                      <div style="position: absolute; bottom: 10px; right: 22px; background: rgba(15, 23, 42, 0.75); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                          <i class="fa fa-search-plus"></i>
+                                      </div>
+                                  </div>
+                                </div>
+
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top" >
+                                    <h6><%=lan.name%> </h6> <span class="f-w-500"><%=driver.first_name%> <%=driver.last_name%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.email%> </h6> <span class="f-w-500"><%=driver.email%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.primary%> <%=lan.mobile%> <%=lan.number%> </h6> <span class="f-w-500"><%=driver.primary_ccode%> <%=driver.primary_phoneNo%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.secondary%> <%=lan.mobile%> <%=lan.number%> </h6> <span class="f-w-500"><%=driver.secound_ccode%> <%=driver.secound_phoneNo%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.nationality%> </h6> <span class="f-w-500"><%=driver.nationality%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.date_of_birth%> </h6> <span class="f-w-500"><%=driver.date_of_birth%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.complete%> <%=lan.address%> </h6> <span class="f-w-500"><%=driver.com_address%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.zone%> </h6> <span class="f-w-500"><%=driver.zone_name%></span>
+                                </div>
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top">
+                                    <h6><%=lan.languages_you_know%> </h6> <span class="f-w-500"><%=driver.language%></span>
+                                </div>
+                                
+                                 <% if (driver.pending_zone) { %>
+                                 <div class="col-12 py-4 border-top" style="margin-top: 20px; text-align: left;">
+                                     <div class="card border-warning" style="background-color: #fdfaf2; border: 1px dashed #ffc107; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);">
+                                         <div class="card-body p-4">
+                                             <h5 class="f-w-600 mb-3" style="color: #856404;"><i class="fa fa-warning"></i> Pending Zone Change Request</h5>
+                                             
+                                             <p class="mb-3 text-dark" style="font-size: 14px;">The driver has requested to update their active zones of service:</p>
+                                             
+                                             <div class="d-flex align-items-center flex-wrap gap-2 mb-4">
+                                                 <div class="px-3 py-2 bg-white border rounded shadow-sm" style="font-size: 13px;">
+                                                     <small class="text-muted d-block">Current Active Zone</small>
+                                                     <strong><%= driver.zone_name || 'None' %></strong>
+                                                 </div>
+                                                 <div class="px-2 text-muted">
+                                                     <i class="fa fa-arrow-right fa-lg"></i>
+                                                 </div>
+                                                 <div class="px-3 py-2 border rounded shadow-sm" style="background-color: #fff9e6; border-color: #ffe8a1 !important; font-size: 13px;">
+                                                     <small class="text-warning d-block f-w-600">Requested New Zone</small>
+                                                     <strong style="color: #664d03;"><%= driver.pending_zone_name || 'None' %></strong>
+                                                 </div>
+                                             </div>
+                                             
+                                             <div class="d-flex gap-2">
+                                                 <a href="/driver/approve_zone/<%= driver.id %>" class="btn btn-success b-r-8 px-4 text-white"><i class="fa fa-check"></i> Approve Request</a>
+                                                 <button type="button" class="btn btn-outline-danger b-r-8 px-4" data-bs-toggle="modal" data-bs-target="#rejectZoneModal"><i class="fa fa-times"></i> Reject Request</button>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <% } %>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="fade tab-pane" id="publish-ride" role="tabpanel" aria-labelledby="publish-ride-tab">
+                        <div class="card mb-0">
+                          <div class="card-header d-flex">
+                            <h4 class="mb-0"><%=lan.publish_ride%></h4>
+                          </div>
+                          <div class="card-body">
+                            <div class="details-bookmark text-center dri_publish_ride">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="fade tab-pane" id="my-ride" role="tabpanel" aria-labelledby="my-ride-tab">
+                        <div class="card mb-0">
+                          <div class="card-header d-flex">
+                            <h4 class="mb-0"><%=lan.my_ride%></h4>
+                          </div>
+                          <div class="card-body">
+                            <div class="details-bookmark text-center dri_my_ride">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="fade tab-pane" id="wallet-transaction" role="tabpanel" aria-labelledby="wallet-transaction-tab">
+                        <div class="card mb-0">
+                          <div class="card-header d-flex">
+                            <h4 class="mb-0"><%=lan.wallet_transaction%></h4>
+                          </div>
+                          <div class="card-body">
+                            <div class="details-bookmark text-center dri_wtransaction_list">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="fade tab-pane" id="vehicle-detail" role="tabpanel" aria-labelledby="vehicle-detail-tab">
+                        <div class="card mb-0">
+                          <div class="card-header d-flex">
+                            <h4 class="mb-0"><%=lan.vehicle_detail%></h4>
+                          </div>
+                          <div class="card-body">
+                            <div class="details-bookmark text-center">
+                              <div class="row" id="bookmarkData">
+                                <div class="col-12 mb-4 text-center">
+                                  <div class="image-preview-container" style="position: relative; display: inline-block; cursor: pointer; transition: all 0.25s ease;" onclick="openLightbox('../../<%=driver.vehicle_image%>')" title="Click to zoom image">
+                                      <img class="me-3 img-thumbnail" src="../../<%=driver.vehicle_image%>" alt="" style="width: 160px; height: 160px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.25s ease;" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='scale(1)';">
+                                      <div style="position: absolute; bottom: 10px; right: 22px; background: rgba(15, 23, 42, 0.75); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                          <i class="fa fa-search-plus"></i>
+                                      </div>
+                                  </div>
+                                </div>
+
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top" >
+                                  <h6><%=lan.vehicle%> <%=lan.name%></h6> <span class="f-w-500"><%=driver.vehicle_name%></span>
+                                </div>
+
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top" >
+                                  <h6><%=lan.vehicle%> <%=lan.registration%> <%=lan.number%> </h6> <span class="f-w-500"><%=driver.vehicle_number%></span>
+                                </div>
+
+                                <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 py-3 border-top" >
+                                  <h6><%=lan.car%> <%=lan.color%> </h6> <span class="f-w-500"><%=driver.car_color%></span>
+                                </div>
+
+                                <div class="col-xxl-6 col-xl-4 col-lg-6 col-md-6 col-sm-12 py-3 border-top" >
+                                  <h6><%=lan.passenger%> <%=lan.capacity%> </h6> <span class="f-w-500"><%=driver.passenger_capacity%></span>
+                                </div>
+
+                                <div class="col-xxl-6 col-xl-4 col-lg-6 col-md-6 col-sm-12 py-3 border-top" >
+                                  <h6><%=lan.vehicle%> <%=lan.preference%> </h6> <span class="f-w-500"><%=driver.veh_pref_name%></span>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Container-fluid Ends-->
+    </div>
+
+    <!-- Reject Zone Modal -->
+    <div class="modal fade" id="rejectZoneModal" tabindex="-1" role="dialog" aria-labelledby="rejectZoneModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectZoneModalLabel">Reject Zone Change Request</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/driver/reject_zone/<%= driver.id %>" method="post">
+                    <div class="modal-body">
+                        <div class="form-group text-start">
+                            <label class="form-label">Rejection Reason</label>
+                            <textarea class="form-control" name="rejection_reason" placeholder="Enter reason for rejecting zone change request" required style="text-align: left;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-danger" type="submit">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Lightbox Modal with Premium Rotate & Zoom Controls -->
+    <div class="modal fade" id="imageLightboxModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" style="background-color: rgba(15, 23, 42, 0.95); border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 25px;">
+                    <h5 class="modal-title" style="color: #fff; font-weight: 600; font-family: 'Montserrat', sans-serif;">Image Preview</h5>
+                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center justify-content-center" style="position: relative; min-height: 500px; padding: 25px; background: radial-gradient(circle, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%);">
+                    <!-- Image Wrapper -->
+                    <div id="lightboxImageWrapper" style="display: flex; align-items: center; justify-content: center; max-width: 100%; max-height: 65vh; transition: all 0.3s ease;">
+                        <img id="lightboxImage" src="" alt="Image Preview" style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);">
+                    </div>
+                    
+                    <!-- Floating Controls Toolbar -->
+                    <div class="d-flex gap-3 mt-4 px-4 py-2" style="background: rgba(30, 41, 59, 0.7); border-radius: 50px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                        <button type="button" class="btn rounded-circle control-btn" id="btnZoomIn" title="Zoom In">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+                        <button type="button" class="btn rounded-circle control-btn" id="btnZoomOut" title="Zoom Out">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                        <button type="button" class="btn rounded-circle control-btn" id="btnRotateLeft" title="Rotate Left 90°">
+                            <i class="fa fa-undo"></i>
+                        </button>
+                        <button type="button" class="btn rounded-circle control-btn" id="btnRotateRight" title="Rotate Right 90°">
+                            <i class="fa fa-repeat"></i>
+                        </button>
+                        <button type="button" class="btn rounded-circle control-btn" id="btnReset" title="Reset View">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .control-btn {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .control-btn i {
+            color: #ffffff !important;
+            font-size: 16px;
+        }
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.08);
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+
+<%- include('./partials/footer'); -%>
+<%- include('./partials/script'); -%>
+
+<script>
+    let currentRotation = 0;
+    let currentZoom = 1;
+
+    function openLightbox(imageSrc) {
+        if (!imageSrc || imageSrc.includes('profile.png')) return;
+        currentRotation = 0;
+        currentZoom = 1;
+        updateTransform();
+        $('#lightboxImage').attr('src', imageSrc);
+        var myModal = new bootstrap.Modal(document.getElementById('imageLightboxModal'));
+        myModal.show();
+    }
+
+    function updateTransform() {
+        $('#lightboxImage').css('transform', `rotate(${currentRotation}deg) scale(${currentZoom})`);
+    }
+
+    $(document).ready(function() {
+        // Lightbox toolbar buttons
+        $('#btnZoomIn').on('click', function() {
+            currentZoom = Math.min(3, currentZoom + 0.25);
+            updateTransform();
+        });
+
+        $('#btnZoomOut').on('click', function() {
+            currentZoom = Math.max(0.5, currentZoom - 0.25);
+            updateTransform();
+        });
+
+        $('#btnRotateLeft').on('click', function() {
+            currentRotation = (currentRotation - 90) % 360;
+            updateTransform();
+        });
+
+        $('#btnRotateRight').on('click', function() {
+            currentRotation = (currentRotation + 90) % 360;
+            updateTransform();
+        });
+
+        $('#btnReset').on('click', function() {
+            currentRotation = 0;
+            currentZoom = 1;
+            updateTransform();
+        });
+    });
+</script>
+</body>
+</html>

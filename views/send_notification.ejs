@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3><%=lan.Send%> <%=lan.Notification%></h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><%=lan.Dashboard%></li>
+                    <li class="breadcrumb-item active"><%=lan.Send%> <%=lan.Notification%></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <% let permiss = per != "1" ? per.send_notification[1] : "1" %>
+                <% if(permiss == "1"){ %>
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <style>
+                              .phone-mockup-wrapper {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100%;
+                                padding: 15px;
+                              }
+                              .phone-mockup {
+                                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                                border-radius: 36px;
+                                border: 12px solid #334155;
+                                padding: 25px 12px;
+                                width: 100%;
+                                max-width: 320px;
+                                min-height: 220px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                                position: relative;
+                                overflow: hidden;
+                              }
+                              .phone-notification {
+                                background: rgba(255, 255, 255, 0.9);
+                                backdrop-filter: blur(20px);
+                                -webkit-backdrop-filter: blur(20px);
+                                border-radius: 16px;
+                                padding: 12px 14px;
+                                width: 100%;
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                                border: 1px solid rgba(255, 255, 255, 0.4);
+                                display: flex;
+                                flex-direction: column;
+                              }
+                              .notification-header {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                margin-bottom: 6px;
+                                font-size: 11px;
+                                color: #64748b;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                              }
+                              .notification-header-left {
+                                display: flex;
+                                align-items: center;
+                                gap: 6px;
+                              }
+                              .notification-app-icon {
+                                width: 14px;
+                                height: 14px;
+                                border-radius: 3px;
+                                background-color: #3b82f6;
+                              }
+                              .notification-body {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                gap: 10px;
+                              }
+                              .notification-text {
+                                flex: 1;
+                                min-width: 0;
+                              }
+                              .notification-title {
+                                font-size: 13.5px;
+                                font-weight: 700;
+                                color: #0f172a;
+                                margin: 0;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                              }
+                              .notification-description {
+                                font-size: 12px;
+                                color: #334155;
+                                margin: 2px 0 0 0;
+                                line-height: 1.35;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 3;
+                                -webkit-box-orient: vertical;
+                                overflow: hidden;
+                              }
+                              .notification-image-container {
+                                width: 45px;
+                                height: 45px;
+                                border-radius: 8px;
+                                overflow: hidden;
+                                flex-shrink: 0;
+                                border: 1px solid rgba(0,0,0,0.05);
+                                display: none;
+                              }
+                              .notification-image-container img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                              }
+                            </style>
+                            <form id="sendnform" class="needs-validation" novalidate="" action="/settings/send_save_notification" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-7 col-lg-7 col-xl-7">
+                                        <div class="row">
+                                            <div class="col-12 form-group mb-3">
+                                                <label class="col-form-label f-w-600"><%=lan.Title%></label>
+                                                <input class="form-control ncheckt" type="text" id="noti_title_input" name="title" placeholder="<%=lan.Enter%> <%=lan.Title%>" required>
+                                            </div>
+                                            <div class="col-12 form-group mb-3">
+                                                <label class="col-form-label f-w-600"><%=lan.Description%></label>
+                                                <textarea class="form-control ncheckd" id="noti_desc_input" name="description" rows="4" placeholder="Enter Description..." required></textarea>
+                                            </div>
+                                            
+                                            <div class="col-12 form-group mb-3">
+                                                <label class="col-form-label f-w-600"><%=lan.Image%> (<%=lan.Ratio%> 1:1)</label>
+                                                <input class="form-control" style="height: 40px;" type="file" id="noti_img_input" name="image" onchange="previewNotificationImage(event)">
+                                            </div>
+
+                                            <% if ((customer && customer.length > 0) || (driver && driver.length > 0)) { %>
+                                                <div class="col-12 mb-3">
+                                                    <label class="col-form-label f-w-600 d-block">Recipient Target</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input selecttype" id="selecttype1" type="radio" name="selecttype" value="1">
+                                                        <label class="form-check-label" for="selecttype1"><%=lan.Send%> <%=lan.All%></label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input selecttype" id="selecttype2" type="radio" name="selecttype" value="2" checked>
+                                                        <label class="form-check-label" for="selecttype2"><%=lan.Selected%> <%=lan.User%></label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row col-12 mt-2" id="notiuser">
+                                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
+                                                        <label class="col-form-label f-w-600"><%=lan.Customer%> <%=lan.List%></label>
+                                                        <select class="js-example-basic-single" id="ncustomer" name="customer" required style="width: 100%;">
+                                                            <option value selected disabled><%=lan.Select%> <%=lan.Customer%></option>
+                                                            <% customer.forEach(function(cus){ %>
+                                                                <option value="<%=cus.id%>"><%=cus.name%> (<%=cus.country_code%> <%=cus.phone%>)</option>
+                                                            <% }) %>
+                                                        </select>
+
+                                                        <div class="form-check mt-2">
+                                                            <input class="form-check-input" id="allcus" type="checkbox" name="allcustomer">
+                                                            <label class="form-check-label" for="allcus"><%=lan.All%> <%=lan.Customer%></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
+                                                        <label class="col-form-label f-w-600"><%=lan.Driver%> <%=lan.List%></label>
+                                                        <select class="js-example-basic-single" id="nsitter" name="driver" required style="width: 100%;">
+                                                            <option value selected disabled><%=lan.Select%> <%=lan.Driver%></option>
+                                                            <% driver.forEach(function(dri){ %>
+                                                                <option value="<%=dri.id%>"><%=dri.first_name%> <%=dri.last_name%> (<%=dri.primary_ccode%> <%=dri.primary_phoneNo%>)</option>
+                                                            <% }) %>
+                                                        </select>
+
+                                                        <div class="form-check mt-2">
+                                                            <input class="form-check-input" id="allsitt" type="checkbox" name="alldriver">
+                                                            <label class="form-check-label" for="allsitt"><%=lan.All%> <%=lan.Driver%></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-5 col-lg-5 col-xl-5 d-flex flex-column align-items-center justify-content-center border-start">
+                                        <label class="f-w-600 mb-3 text-muted">Real-time Device Preview</label>
+                                        <div class="phone-mockup-wrapper">
+                                            <div class="phone-mockup">
+                                                <div class="phone-notification">
+                                                    <div class="notification-header">
+                                                        <div class="notification-header-left">
+                                                            <div class="notification-app-icon d-flex align-items-center justify-content-center text-white" style="font-size: 8px; font-weight: bold; background-color: #7366ff;">Z</div>
+                                                            <span>ZIPPYGO</span>
+                                                        </div>
+                                                        <span>now</span>
+                                                    </div>
+                                                    <div class="notification-body">
+                                                        <div class="notification-text">
+                                                            <h5 class="notification-title" id="preview-title">Notification Title</h5>
+                                                            <p class="notification-description" id="preview-desc">Notification description text goes here. Keep it descriptive and direct...</p>
+                                                        </div>
+                                                        <div class="notification-image-container" id="preview-img-container">
+                                                            <img id="mobile-preview-img" src="" alt="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <p class="text-danger d-none mt-3" id="send_all"><%=lan.Please_Enter_All_Detail%>.</p>
+                                    </div>
+                                </div>
+                            </form>
+                            <% if ((customer && customer.length > 0) || (driver && driver.length > 0)) { %>
+                                <div class="text-end mt-3 d-flex justify-content-end gap-2">
+                                    <button class="btn btn-secondary px-4 b-r-10 d-inline-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#testSendModal"><i class="fa fa-paper-plane me-2"></i>Send Test</button>
+                                    <button class="btn btn-square btn-primary btn-air-primary add_detail_btn b-r-10 px-4" id="notificatio_btn" type="submit"><%=lan.Send%> <%=lan.Notification%></button> 
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+
+
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header pb-0">
+                            <h6 class="mb-0"><%=lan.Push%> <%=lan.Notification%></h6>
+                        </div>
+                        <div class="card-body">
+                            <%- include('./partials/table_skeleton'); -%>
+                            <div class="real-table-wrapper dt-loading">
+                                <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th><%= lan.hash %></th>
+                                            <th><%=lan.Image%></th>
+                                            <th><%=lan.Title%></th>
+                                            <th><%=lan.Description%></th>
+                                            <th><%=lan.Customer%></th>
+                                            <th><%=lan.Driver%></th>
+                                            <th><%=lan.Date%></th>
+                                            <th><%=lan.Notification%> <%=lan.Count%></th>
+                                            <th><%=lan.Status%></th>
+                                            <th><%=lan.Resend%></th>
+                                            <% let permissions = per != "1" ? per.send_notification[2] : "1" %>
+                                            <% if(permissions == "1"){ %>
+                                            <th><%=lan.Action%></th>
+                                            <% } %>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% var i = 1 %>
+                                        <% pdata.forEach((data) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td class="pt-1 pb-1">
+                                                    <% if(!data.image || data.image == "" || data.image == "0" || data.image == "null" || data.image == "undefined"){ %>
+                                                        -
+                                                    <% } else { %>
+                                                        <a href="../../<%= data.image %>" target="_blank"><img width="50px" height="50px" src="../../<%= data.image %>" alt="<%= lan.image_alt %>" style="border-radius: 5px; object-fit: cover;"></a>
+                                                    <% }; %>
+                                                </td>
+                                                <td><%= data.title %></td>
+                                                <td><%= data.description %></td>
+                                                <td>
+                                                    <% if (data.customer != '' && data.customer != 'All') { %>
+                                                        <%= data.cus_name %>
+                                                    <% } else if (data.customer == 'All') { %>
+                                                        <%=lan.All%>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (data.driver != '' && data.driver != 'All') { %>
+                                                        <%= data.first_name %> <%= data.last_name %>
+                                                    <% } else if (data.driver == 'All') { %>
+                                                        <%=lan.All%>
+                                                    <% } %>
+                                                </td>
+                                                <td><%= data.date %></td>
+                                                <td><%= data.count %></td>
+                                                <td>
+                                                    <% if (data.status == '1') { %>
+                                                        <span class="badge badge-success"><%=lan.Active%></span>
+                                                    <% } else { %>
+                                                        <span class="badge badge-danger"><%=lan.Deactive%></span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                     <ul class="action"> 
+                                                         <li class="custom_tooltip"><a href="/settings/noti_resend/<%= data.id %>"><i class="icon-reload"></i></a><span class="tooltiptext" style="width: 100px; margin-left: -50px; padding: 5px; font-size: 11px; bottom: 135%;">Resend Noti</span></li>
+                                                     </ul>
+                                                 </td>
+                                                 <% if(permissions == "1"){ %>
+                                                 <td>
+                                                     <ul class="action"> 
+                                                     <li class="edit custom_tooltip"><a href="/settings/send_edit/<%= data.id %>"><i class="icon-pencil-alt"></i></a><span class="tooltiptext" style="width: 100px; margin-left: -50px; padding: 5px; font-size: 11px; bottom: 135%;">Edit Noti</span></li>
+                                                     <li class="delete custom_tooltip"><a href="/settings/noti_delete/<%= data.id %>"><i class="icon-trash"></i></a><span class="tooltiptext" style="width: 100px; margin-left: -50px; padding: 5px; font-size: 11px; bottom: 135%;">Delete Noti</span></li>
+                                                     </ul>
+                                                 </td>
+                                                <% } %>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+        <!-- Test Send Modal -->
+        <div class="modal fade" id="testSendModal" tabindex="-1" role="dialog" aria-labelledby="testSendModalLabel" aria-hidden="true" style="z-index: 1060;">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="testSendModalLabel">Send Test Push Notification</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="testSendForm">
+                        <div class="modal-body">
+                            <p class="text-muted mb-3 f-13">Send a real push notification to a specific test user device to preview formatting, title, description, and images.</p>
+                            <div class="form-group mb-3">
+                                <label class="form-label f-w-600">Recipient Type</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="test_type" id="test_type_customer" value="customer" checked>
+                                        <label class="form-check-label ms-1" for="test_type_customer">Customer</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="test_type" id="test_type_driver" value="driver">
+                                        <label class="form-check-label ms-1" for="test_type_driver">Driver</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Customer Select -->
+                            <div class="form-group mb-3" id="test_customer_group">
+                                <label class="form-label f-w-600">Select Test Customer</label>
+                                <select class="js-example-basic-single w-100" id="test_customer_id" required style="width: 100%;">
+                                    <option value selected disabled>Select Test Customer</option>
+                                    <% customer.forEach(function(cus){ %>
+                                        <option value="<%=cus.id%>"><%=cus.name%> (<%=cus.country_code%> <%=cus.phone%>)</option>
+                                    <% }) %>
+                                </select>
+                            </div>
+
+                            <!-- Driver Select -->
+                            <div class="form-group mb-3 d-none" id="test_driver_group">
+                                <label class="form-label f-w-600">Select Test Driver</label>
+                                <select class="js-example-basic-single w-100" id="test_driver_id" style="width: 100%;">
+                                    <option value selected disabled>Select Test Driver</option>
+                                    <% driver.forEach(function(dri){ %>
+                                        <option value="<%=dri.id%>"><%=dri.first_name%> <%=dri.last_name%> (<%=dri.primary_ccode%> <%=dri.primary_phoneNo%>)</option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="button" id="btnSubmitTestSend">Send Test Now</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('./partials/footer'); -%>
+        <%- include('./partials/script'); -%>
+        
+        <script src="/js/select2/select2.full.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Initialize Select2 dropdowns for premium visual appearance
+                $('#ncustomer, #nsitter').select2();
+
+                $('#test_customer_id').select2({
+                    dropdownParent: $('#testSendModal')
+                });
+
+                $('#test_driver_id').select2({
+                    dropdownParent: $('#testSendModal')
+                });
+
+                // Real-time Text Preview handlers
+                $('#noti_title_input').on('input', function() {
+                    $('#preview-title').text($(this).val() || 'Notification Title');
+                });
+                
+                $('#noti_desc_input').on('input', function() {
+                    $('#preview-desc').text($(this).val() || 'Notification description text goes here. Keep it descriptive and direct...');
+                });
+
+                // Recipient Type toggle in Test Modal
+                $('input[name="test_type"]').on('change', function() {
+                    if ($(this).val() === 'customer') {
+                        $('#test_customer_group').removeClass('d-none');
+                        $('#test_driver_group').addClass('d-none');
+                        $('#test_customer_id').prop('required', true);
+                        $('#test_driver_id').prop('required', false);
+                    } else {
+                        $('#test_customer_group').addClass('d-none');
+                        $('#test_driver_group').removeClass('d-none');
+                        $('#test_customer_id').prop('required', false);
+                        $('#test_driver_id').prop('required', true);
+                    }
+                });
+
+                // Test Send Submission Handler
+                $('#btnSubmitTestSend').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    var title = $('#noti_title_input').val();
+                    var desc = $('#noti_desc_input').val();
+                    if (!title || !desc) {
+                        toastr.error('Please enter Title and Description first.');
+                        return;
+                    }
+
+                    var testType = $('input[name="test_type"]:checked').val();
+                    var testId = testType === 'customer' ? $('#test_customer_id').val() : $('#test_driver_id').val();
+                    
+                    if (!testId) {
+                        toastr.error('Please select a recipient to send the test notification.');
+                        return;
+                    }
+
+                    // Create Form Data to support image uploads in test send
+                    var formData = new FormData();
+                    formData.append('title', title);
+                    formData.append('description', desc);
+                    formData.append('test_type', testType);
+                    formData.append('test_id', testId);
+                    
+                    var imgFile = $('#noti_img_input')[0].files[0];
+                    if (imgFile) {
+                        formData.append('image', imgFile);
+                    }
+
+                    var $btn = $(this);
+                    $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>Sending...');
+
+                    $.ajax({
+                        url: '/settings/send_test_notification',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(res) {
+                            $btn.prop('disabled', false).text('Send Test Now');
+                            if (res.success) {
+                                toastr.success(res.message);
+                                $('#testSendModal').modal('hide');
+                            } else {
+                                toastr.error(res.message);
+                            }
+                        },
+                        error: function(err) {
+                            $btn.prop('disabled', false).text('Send Test Now');
+                            toastr.error('Error sending test notification');
+                            console.error(err);
+                        }
+                    });
+                });
+            });
+
+            // Handle previewing notification image inside the lock screen mockup
+            function previewNotificationImage(event) {
+                if (event.target.files.length > 0) {
+                    var src = URL.createObjectURL(event.target.files[0]);
+                    var mobPreviewImg = document.getElementById("mobile-preview-img");
+                    var mobPreviewContainer = document.getElementById("preview-img-container");
+                    if (mobPreviewImg && mobPreviewContainer) {
+                        mobPreviewImg.src = src;
+                        mobPreviewContainer.style.display = 'block';
+                    }
+                }
+            }
+        </script>
+  </body>
+</html>

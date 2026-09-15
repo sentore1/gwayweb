@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    <link rel="stylesheet" type="text/css" href="../../css/timeline.css">
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3><%=lan.Ride%> <%=lan.Detail%></h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><%=lan.Dashboard%></li>
+                    <li class="breadcrumb-item active"><%=lan.Ride%> <%=lan.Detail%></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-sm-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div>
+                                <h5><%=lan.Rider%> <%=lan.Information%></h5>
+                            </div>
+                            <hr style="height: 3px;">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Name%> <%=lan.colon%></span>
+                                <span><%=rd.cname%></span>
+                            </div>
+                            <hr class="mt-2 mb-2">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Email%> <%=lan.colon%></span>
+                                <span><%=rd.cemail%></span>
+                            </div>
+                            <hr class="mt-2 mb-2">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Mobile%> <%=lan.Number%> <%=lan.colon%></span>
+                                <span><%=rd.cccode%> <%=rd.cphone%></span>
+                            </div>
+                            <hr class="mt-2 mb-2">
+                            
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Total%> <%=lan.Ride%> <%=lan.colon%></span>
+                                <span><%=rd.tot_order%></span>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div>
+                                <h5><%=lan.Driver%> <%=lan.Information%></h5>
+                            </div>
+                            <hr style="height: 3px;">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Name%> <%=lan.colon%></span>
+                                <span><%=rd.dfname%> <%=rd.dlname%></span>
+                            </div>
+                            <hr class="mt-2 mb-2">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Email%> <%=lan.colon%></span>
+                                <span><%=rd.demail%></span>
+                            </div>
+                            <hr class="mt-2 mb-2">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Mobile%> <%=lan.Number%> <%=lan.colon%></span>
+                                <span><%=rd.dpcode%> <%=rd.dpnumber%></span>
+                            </div>
+                            <hr class="mt-2 mb-2">
+                        
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <span><%=lan.Secoundary%> <%=lan.Mobile%> <%=lan.Number%> <%=lan.colon%></span>
+                                <span><%=rd.dscode%> <%=rd.dsnumber%></span>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                            
+                                <div>
+                                    <h5><%=lan.Ride%> <%=lan.Information%></h5>
+                                    <hr style="height: 3px;">
+                                </div>
+                            
+                                <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                                    <div>
+                                        <h5><%=lan.Ride%> <%=lan.Id%></h5>
+                                        <span><%=lan.hash%><%=rd.id%></span>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h5><%=lan.Amount%></h5>
+                                        <span class="invosymbol"><%=(rd.final_price).toFixed(2)%></span>
+                                    </div>
+                                </div>
+                            
+                                <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 ul_padding">
+                                    <div>
+                                        <h5><%=lan.Service%></h5>
+                                        <span><%=rd.vehicle_name%></span>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h5><%=lan.Status%></h5>
+                                        <div class="d-flex align-items-center flex-wrap mt-2" style="gap: 10px;">
+                                            <% if (rd.status == '0') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.New%> <%=lan.Ride%></span>
+                                            <% } else if (rd.status == '1') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.Accept%> <%=lan.Ride%></span>
+                                            <% } else if (rd.status == '2') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.Arrived_at_the_location%></span>
+                                            <% } else if (rd.status == '3') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.Confirm%> <%=lan.Ride%></span>
+                                            <% } else if (rd.status == '4') { %>
+                                                <span class="badge badge-danger p-1 f-14" style="line-height: 20px;"><%=lan.Ride%> <%=lan.Cancel%></span>
+                                            <% } else if (rd.status == '5') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.Ride%> <%=lan.Start%></span>
+                                            <% } else if (rd.status == '6') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.Ride%> <%=lan.End%></span>
+                                            <% } else if (rd.status == '7') { %>
+                                                <span class="badge badge-warning p-1 f-14" style="line-height: 20px;"><%=lan.Waiting%> <%=lan.Payment%></span>
+                                            <% } else if (rd.status == '8') { %>
+                                                <span class="badge badge-success p-1 f-14" style="line-height: 20px;"><%=lan.Complete%></span>
+                                            <% }; %>
+
+                                            <% if ((rd.status == '5' || rd.status == '6') && rd.trip_start_time) { %>
+                                                 <span class="badge p-1 f-14" id="trip-timer-container" style="background: rgba(115, 102, 255, 0.1); border: 1px solid rgba(115, 102, 255, 0.2); color: #7366ff; display: inline-flex; align-items: center; gap: 5px; line-height: 20px; padding: 0.25rem 0.5rem !important;">
+                                                     <i class="fa fa-clock-o"></i> Active Duration: <span id="trip-timer" class="font-primary f-w-600">00:00:00</span>
+                                                 </span>
+                                                 <script>
+                                                     (function() {
+                                                         const startTime = new Date("<%= rd.trip_start_time %>").getTime();
+                                                         const serverTimeOnLoad = <%= new Date().getTime() %>;
+                                                         const clientTimeOnLoad = new Date().getTime();
+                                                         const offset = serverTimeOnLoad - clientTimeOnLoad;
+                                                         
+                                                         function updateTimer() {
+                                                             const now = new Date().getTime() + offset;
+                                                             const diff = now - startTime;
+                                                             if (diff < 0) {
+                                                                 document.getElementById('trip-timer').innerText = "00:00:00";
+                                                                 return;
+                                                             }
+                                                             const hours = Math.floor(diff / (1000 * 60 * 60));
+                                                             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                                                             
+                                                             const pad = (num) => String(num).padStart(2, '0');
+                                                             document.getElementById('trip-timer').innerText = pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
+                                                         }
+                                                         updateTimer();
+                                                         setInterval(updateTimer, 1000);
+                                                     })();
+                                                 </script>
+                                            <% } %>
+
+                                            <% if (typeof rd.expiry_time !== 'undefined' && rd.expiry_time) { %>
+                                                 <span class="badge p-1 f-14" id="expiry-timer-container" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.2); color: #dc3545; display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.5rem !important; line-height: 20px;">
+                                                     <i class="fa fa-hourglass-half"></i> Expiry Countdown: <span id="expiry-timer" class="font-danger f-w-600">00:00</span>
+                                                 </span>
+                                                 <script>
+                                                     (function() {
+                                                         const expireTime = new Date("<%= rd.expiry_time %>").getTime();
+                                                         const serverTimeOnLoad = <%= new Date().getTime() %>;
+                                                         const clientTimeOnLoad = new Date().getTime();
+                                                         const offset = serverTimeOnLoad - clientTimeOnLoad;
+                                                         
+                                                         function updateExpiryTimer() {
+                                                             const now = new Date().getTime() + offset;
+                                                             const diff = expireTime - now;
+                                                             if (diff <= 0) {
+                                                                 document.getElementById('expiry-timer').innerText = "Expired / Expiring";
+                                                                 document.getElementById('expiry-timer-container').style.color = '#6c757d';
+                                                                 document.getElementById('expiry-timer-container').style.background = 'rgba(108, 117, 125, 0.1)';
+                                                                 document.getElementById('expiry-timer-container').style.borderColor = 'rgba(108, 117, 125, 0.2)';
+                                                                 return;
+                                                             }
+                                                             const minutes = Math.floor(diff / (1000 * 60));
+                                                             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                                                             
+                                                             const pad = (num) => String(num).padStart(2, '0');
+                                                             document.getElementById('expiry-timer').innerText = pad(minutes) + "m " + pad(seconds) + "s";
+                                                         }
+                                                         updateExpiryTimer();
+                                                         setInterval(updateExpiryTimer, 1000);
+                                                     })();
+                                                 </script>
+                                            <% } %>
+                                        </div>
+
+                                        <% if (typeof rd.expiry_time !== 'undefined' && rd.expiry_time) { %>
+                                             <div class="mt-2 text-muted f-12" id="expiry-at-container" style="margin-left: 2px;">
+                                                 Expires at: <%= new Date(rd.expiry_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                             </div>
+                                        <% } %>
+                                     </div>
+                                 </div>
+                            
+                                <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4 ul_padding">
+                                    <div>
+                                        <h5><%=lan.Ride%> <%=lan.Type%></h5>
+                                        <% if (rd.bidding_status == '1') { %>
+                                            <span class="badge badge-success p-1 f-14"><%=lan.Bidding%></span>
+                                        <% } else { %>
+                                            <span class="badge badge-success p-1 f-14"><%=lan.Normal%></span>
+                                        <% }; %>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h5><%=lan.Module%> <%=lan.Type%></h5>
+                                        <span><%=rd.mode_title%></span>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                            
+                                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-5">
+                                    <div>
+                                        <h5><%=lan.Ride%> <%=lan.Information%></h5>
+                                        <hr style="height: 3px;">
+                                    </div>
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span><%=lan.Distance%> :- </span>
+                                        <span><%= (rd.tot_km != null) ? parseFloat(parseFloat(rd.tot_km).toFixed(4)) : '0' %> <%=lan.KM%></span>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span><%=lan.Ride%> <%=lan.start%> <%=lan.Time%> :- </span>
+                                        <span><%=rd.start_time%></span>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span><%=lan.Ride%> <%=lan.End%> <%=lan.Time%> :- </span>
+                                        <span><%=rd.end_time%></span>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span><%=lan.Duration%> :- </span>
+                                        <span><%=rd.status_time%>  <%=lan.Hour%></span>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span><%=lan.Payment%> <%=lan.Type%> :- </span>
+                                        <span><%=rd.pay_name%></span>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <span><%=lan.Payment%> <%=lan.Status%> :- </span>
+                                        <% if (rd.paid_status == '1') { %>
+                                            <span class="badge badge-success p-1 f-14"><%=lan.Paid%></span>
+                                        <% } else { %>
+                                            <span class="badge badge-warning p-1 f-14">Pending Approval</span>
+                                        <% } %>
+                                    </div>
+                                    <% if (rd.payment_id == "10" || rd.payment_id == "11") { %>
+                                    <hr class="mt-2 mb-2">
+                                    <div class="d-flex justify-content-between flex-wrap align-items-center">
+                                        <span>Payment Proof :- </span>
+                                        <% if (rd.payment_img) { %>
+                                            <div class="d-flex gap-2 align-items-center">
+                                                <a href="../../<%= rd.payment_img %>" target="_blank" class="btn btn-xs btn-primary font-weight-bold" style="padding: 3px 8px; font-size: 11px;">View Receipt Image</a>
+                                                <% if (rd.paid_status == '0') { %>
+                                                    <form action="/rides/approve_payment" method="POST" class="d-inline">
+                                                        <input type="hidden" name="order_id" value="<%= rd.id %>">
+                                                        <button type="submit" class="btn btn-xs btn-success text-white font-weight-bold" style="padding: 3px 8px; font-size: 11px;">Approve Payment</button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        <% } else { %>
+                                            <span class="badge badge-danger p-1">No Receipt Uploaded</span>
+                                        <% } %>
+                                    </div>
+                                    <% } %>
+                                </div>
+                            
+                                <div class="col-sm-0 col-md-0 col-lg-2 col-xl-2"></div>
+                            
+                                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-5 ul_padding">
+                                    <div>
+                                        <h5><%=lan.Payment%> <%=lan.Information%></h5>
+                                        <hr style="height: 3px;">
+                                    </div>
+
+                                    <!-- Dynamic Fare Calculation Math for Tooltips -->
+                                    <% 
+                                        let minDist = parseFloat(rd.min_km_distance || 0);
+                                        let minPrice = parseFloat(rd.min_km_price || 0);
+                                        let afterPrice = parseFloat(rd.after_km_price || 0);
+                                        let kmCharge = parseFloat(rd.km_charge || 0);
+                                        let extraChargeVal = parseFloat(rd.extra_charge || 0);
+                                        let weatherPriceVal = parseFloat(rd.weather_price || 0);
+                                        
+                                        // Calculate estimated distance from km_charge
+                                        let estDistance = 0;
+                                        if (minPrice > 0) {
+                                            if (kmCharge <= (minDist * minPrice)) {
+                                                estDistance = kmCharge / minPrice;
+                                            } else {
+                                                estDistance = minDist + ((kmCharge - (minDist * minPrice)) / afterPrice);
+                                            }
+                                        }
+                                        
+                                        let distanceToShow = parseFloat(rd.tot_km) > 0 ? parseFloat(rd.tot_km) : estDistance;
+                                        
+                                        let kmChargeTooltip = '';
+                                        if (distanceToShow <= minDist) {
+                                            kmChargeTooltip = `Distance: Base (${parseFloat(distanceToShow.toFixed(2))} km × $${parseFloat(minPrice.toFixed(2))}/km) = $${parseFloat(kmCharge.toFixed(2))}.`;
+                                        } else {
+                                            let extraDist = distanceToShow - minDist;
+                                            let basePart = minDist * minPrice;
+                                            let extraPart = extraDist * afterPrice;
+                                            kmChargeTooltip = `Distance: Base (${minDist} km × $${parseFloat(minPrice.toFixed(2))}/km) + Extra (${parseFloat(extraDist.toFixed(2))} km × $${parseFloat(afterPrice.toFixed(2))}/km) = $${basePart.toFixed(2)} + $${extraPart.toFixed(2)} = $${parseFloat(kmCharge.toFixed(2))}.`;
+                                        }
+
+                                        let waitRate = 0;
+                                        if (rd.m_role == 1 || rd.m_role == '1') {
+                                            waitRate = parseFloat(general.driver_wait_price || 0);
+                                        } else if (rd.m_role == 2 || rd.m_role == '2') {
+                                            waitRate = parseFloat(general.out_after_min_wait_price || 0);
+                                        } else if (rd.m_role == 3 || rd.m_role == '3') {
+                                            waitRate = parseFloat(general.ren_after_min_wait_price || 0);
+                                        } else if (rd.m_role == 4 || rd.m_role == '4') {
+                                            waitRate = parseFloat(general.pack_after_min_wait_price || 0);
+                                        }
+                                        let additionalTime = parseFloat(rd.additional_time || 0);
+                                        let addiTimePriceTooltip = `Additional Time: ${additionalTime} mins × $${waitRate.toFixed(2)}/min = $${parseFloat(rd.addi_time_price || 0).toFixed(2)}.`;
+
+                                        let weatherType = (rd.weather_type || general.weather_type || 'fix').toString().toLowerCase();
+                                        let weatherTooltip = '';
+                                        if (weatherType === 'fix') {
+                                            weatherTooltip = `Weather: Flat Surcharge = $${parseFloat(rd.weather_price || 0).toFixed(2)}.`;
+                                        } else {
+                                            let subtotalForWeather = (parseFloat(rd.final_price || rd.price || 0) - parseFloat(rd.weather_price || 0));
+                                            weatherTooltip = `Weather: Subtotal ($${subtotalForWeather.toFixed(2)}) × ${general.weather_price}% = $${parseFloat(rd.weather_price || 0).toFixed(2)}.`;
+                                        }
+
+                                        let commRate = parseFloat(rd.comission_rate || 0);
+                                        let commType = (rd.comission_type || '').trim().toLowerCase();
+                                        let isFix = commType === 'fix';
+                                        let platformFeeSubtotal = (parseFloat(rd.final_price || 0) > 0 ? parseFloat(rd.final_price) : parseFloat(rd.price || 0)) - parseFloat(rd.platform_fee || 0);
+                                        let commissionTooltip = '';
+                                        if (isFix) {
+                                            commissionTooltip = `Platform Fee: Fixed Rate = $${parseFloat(rd.platform_fee || 0).toFixed(2)}.`;
+                                        } else {
+                                            commissionTooltip = `Platform Fee: Subtotal ($${platformFeeSubtotal.toFixed(2)}) × ${commRate}% = $${parseFloat(rd.platform_fee || 0).toFixed(2)}.`;
+                                        }
+
+                                        let rentalAddiRideTime = parseFloat(rd.rental_addi_ride_time || 0);
+                                        let rentalAddiRideCharge = parseFloat(rd.rental_addi_ride_charge || 0);
+                                        let rentalAddiRideRate = rentalAddiRideTime > 0 ? (rentalAddiRideCharge / rentalAddiRideTime) : 0;
+                                        let rentalAddiRideTooltip = `Additional Ride: ${rentalAddiRideTime} mins × $${rentalAddiRideRate.toFixed(2)}/min = $${rentalAddiRideCharge.toFixed(2)}.`;
+
+                                        let rentalExtraKm = parseFloat(rd.rental_extra_km || 0);
+                                        let rentalExtraKmCharge = parseFloat(rd.rental_extra_km_charge || 0);
+                                        let rentalExtraKmRate = rentalExtraKm > 0 ? (rentalExtraKmCharge / rentalExtraKm) : 0;
+                                        let rentalExtraKmTooltip = `Extra KM: ${rentalExtraKm} km × $${rentalExtraKmRate.toFixed(2)}/km = $${rentalExtraKmCharge.toFixed(2)}.`;
+
+                                        let totKg = parseFloat(rd.tot_kg || 0);
+                                        let kgCharge = parseFloat(rd.kg_charge || 0);
+                                        let kgRate = totKg > 0 ? (kgCharge / totKg) : 0;
+                                        let kgChargeTooltip = `Weight: ${totKg} KG × $${kgRate.toFixed(2)}/KG = $${kgCharge.toFixed(2)}.`;
+
+                                        let totalCharges = parseFloat(rd.km_charge || 0) +
+                                                           parseFloat(rd.addi_time_price || 0) +
+                                                           parseFloat(rd.weather_price || 0) +
+                                                           parseFloat(rd.extra_charge || 0) +
+                                                           parseFloat(rd.extra_person_charge || 0) +
+                                                           parseFloat(rd.day_charge || 0) +
+                                                           parseFloat(rd.rental_addi_ride_charge || 0) +
+                                                           parseFloat(rd.rental_hour_charge || 0) +
+                                                           parseFloat(rd.rental_extra_km_charge || 0) +
+                                                           parseFloat(rd.kg_charge || 0) +
+                                                           parseFloat(rd.platform_fee || 0);
+                                                           
+                                        let totalDeductions = parseFloat(rd.rental_per_hour_discount || 0) +
+                                                              parseFloat(rd.coupon_amount || 0) +
+                                                              parseFloat(rd.wallet_price || 0);
+                                                              
+                                        let finalFareTooltip = `Total Fare: Charges ($${totalCharges.toFixed(2)}) - Deductions ($${totalDeductions.toFixed(2)}) = $${(parseFloat(rd.final_price || 0) > 0 ? parseFloat(rd.final_price).toFixed(2) : parseFloat(rd.price || 0).toFixed(2))}.`;
+                                    %>
+
+                                    <!-- Charges Section -->
+                                    <small class="text-muted text-uppercase f-w-600 d-block mb-2" style="letter-spacing:1px; font-size:11px;">Charges</small>
+
+                                    <% if (rd.km_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            Base Distance Charge
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= kmChargeTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.km_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+
+                                    <% if (rd.addi_time_price > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Additional%> <%=lan.Time%> <%=lan.Charge%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= addiTimePriceTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.addi_time_price%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.weather_price > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            Weather Adjustment
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= weatherTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.weather_price%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.extra_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            Surcharges
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="Surcharge: Flat Surcharge = $<%= parseFloat(extraChargeVal.toFixed(2)) %>."></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.extra_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.extra_person_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Extra%> <%=lan.Person%> <%=lan.Charge%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="Extra Person: Surcharge = $<%= parseFloat(rd.extra_person_charge || 0).toFixed(2) %>."></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.extra_person_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.day_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Day%> <%=lan.Charge%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="Day Charge: Flat Surcharge = $<%= parseFloat(rd.day_charge || 0).toFixed(2) %>."></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.day_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.rental_addi_ride_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Additional%> <%=lan.Ride%> <%=lan.Charge%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= rentalAddiRideTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.rental_addi_ride_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.rental_hour_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Rent%> <%=lan.Hour%> <%=lan.Charge%> (<%=rd.rent_hour%> <%=lan.Hour%>)
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="Rental Hour Charge: Flat Package Rate = $<%= parseFloat(rd.rental_hour_charge || 0).toFixed(2) %>."></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.rental_hour_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.rental_extra_km_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Extra%> <%=lan.KM%> <%=lan.Charge%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= rentalExtraKmTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.rental_extra_km_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.kg_charge > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.KG%> <%=lan.Charge%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= kgChargeTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.kg_charge%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.platform_fee > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center" style="color:#e65100;">
+                                            Platform Fee
+                                            <i class="fa fa-info-circle" style="font-size:12px; cursor:pointer; color:#e65100; margin-left:8px; opacity:0.6;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= commissionTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500" style="color:#e65100;"><%=rd.platform_fee%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <!-- Deductions Section -->
+                                    <% if (rd.rental_per_hour_discount > 0 || rd.coupon_amount > 0 || rd.wallet_price > 0) { %>
+                                    <small class="text-muted text-uppercase f-w-600 d-block mb-2 mt-3" style="letter-spacing:1px; font-size:11px;">Deductions</small>
+                                    <% } %>
+ 
+                                    <% if (rd.rental_per_hour_discount > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center" style="color:#2e7d32;">
+                                            <%=lan.Rent%> <%=lan.Per%> <%=lan.Hour%> <%=lan.Discount%>
+                                            <i class="fa fa-info-circle" style="font-size:12px; cursor:pointer; color:#2e7d32; margin-left:8px; opacity:0.6;" data-bs-toggle="tooltip" data-bs-placement="top" title="Discount applied on per-hour rental rate"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500" style="color:#2e7d32;">-<%=rd.rental_per_hour_discount%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+ 
+                                    <% if (rd.coupon_amount > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center" style="color:#2e7d32;">
+                                            <%=lan.Coupon%> <%=lan.Discount%>
+                                            <i class="fa fa-info-circle" style="font-size:12px; cursor:pointer; color:#2e7d32; margin-left:8px; opacity:0.6;" data-bs-toggle="tooltip" data-bs-placement="top" title="Promotional coupon code discount applied by the customer at booking: -$<%= parseFloat(rd.coupon_amount).toFixed(2) %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500" style="color:#2e7d32;">-<%=rd.coupon_amount%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+                                    
+                                    <% if (rd.wallet_price > 0) { %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center" style="color:#2e7d32;">
+                                            <%=lan.Wallet%> <%=lan.Amount%>
+                                            <i class="fa fa-info-circle" style="font-size:12px; cursor:pointer; color:#2e7d32; margin-left:8px; opacity:0.6;" data-bs-toggle="tooltip" data-bs-placement="top" title="Amount deducted from customer's wallet balance: -$<%= parseFloat(rd.wallet_price).toFixed(2) %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500" style="color:#2e7d32;">-<%=rd.wallet_price%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+                                    
+                                    <!-- Bid Adjustment Section -->
+                                    <% if (rd.bid_addjust_amount != "") { %>
+                                    <small class="text-muted text-uppercase f-w-600 d-block mb-2 mt-3" style="letter-spacing:1px; font-size:11px;">Bid Adjustment</small>
+                                        
+                                     <% let splbp = rd.bid_addjust_amount != '' ? rd.bid_addjust_amount.split(" ") : []; %>
+                                     <% let totdp = rd.final_price > 0 ? rd.final_price : rd.price; %>
+                                     <% let totbpr = rd.bid_addjust_amount != '' ? ( splbp[0] == '+' ? totdp - Number(splbp[1]) : totdp + Number(splbp[1]) ) : totdp; %>
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Base%> <%=lan.fare%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="Original fare estimate before driver's bid adjustment: $<%= parseFloat(totbpr).toFixed(2) %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=totbpr%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    
+                                    <div class="d-flex justify-content-between align-items-center" style="padding:6px 0;">
+                                        <span class="d-flex align-items-center">
+                                            <%=lan.Bid_Adjustment%>
+                                            <i class="fa fa-info-circle text-muted" style="font-size:12px; cursor:pointer; margin-left:8px; opacity:0.5;" data-bs-toggle="tooltip" data-bs-placement="top" title="Price adjustment from driver's winning bid (final fare difference): <%= rd.bid_addjust_amount %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-500"><%=rd.bid_addjust_amount%></span>
+                                    </div>
+                                    <hr class="m-0" style="border-color:#eee;">
+                                    <% } %>
+                                
+                                    <!-- Final Fare (Highlighted) -->
+                                    <div class="d-flex justify-content-between align-items-center mt-3 p-2 rounded" style="background:#f0f1ff;">
+                                        <span class="f-w-700 f-16 d-flex align-items-center">
+                                            <%=lan.Final%> <%=lan.fare%>
+                                            <i class="fa fa-info-circle" style="font-size:12px; cursor:pointer; color:#5c61f2; margin-left:8px; opacity:0.6;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= finalFareTooltip %>"></i>
+                                        </span>
+                                        <span class="invosymbol f-w-700 f-16" style="color:#5c61f2;"><%= parseFloat(rd.final_price || 0) > 0 ? parseFloat(rd.final_price).toFixed(2) : parseFloat(rd.price || 0).toFixed(2) %></span>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Summary Card -->
+                <% 
+                    let earnings_final = parseFloat(rd.final_price || 0) > 0 ? parseFloat(rd.final_price) : parseFloat(rd.price || 0);
+                    let earnings_commission = parseFloat(rd.platform_fee || 0);
+                    let earnings_driver = earnings_final - earnings_commission;
+                    let earnings_wallet = parseFloat(rd.wallet_price || 0);
+                    let earnings_paid_online = earnings_final - earnings_wallet;
+                %>
+                <div class="col-12">
+                    <div class="card" style="border-left: 4px solid #5c61f2;">
+                        <div class="card-body">
+                            <h5 class="mb-3"><i class="icon-bar-chart" style="margin-right: 6px; color: #5c61f2;"></i>Earnings Summary</h5>
+                            <div class="row">
+                                <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+                                    <div class="p-3 rounded" style="background: #f0f1ff; text-align: center;">
+                                        <small class="text-muted d-block mb-1">Total Fare</small>
+                                        <span class="invosymbol f-w-700 f-20" style="color: #333;"><%= earnings_final.toFixed(2) %></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+                                    <div class="p-3 rounded" style="background: #fff3e0; text-align: center;">
+                                        <small class="text-muted d-block mb-1">Platform Fee</small>
+                                        <span class="invosymbol f-w-700 f-20" style="color: #e65100;"><%= earnings_commission.toFixed(2) %></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+                                    <div class="p-3 rounded" style="background: #e8f5e9; text-align: center;">
+                                        <small class="text-muted d-block mb-1">Driver Earnings</small>
+                                        <span class="invosymbol f-w-700 f-20" style="color: #2e7d32;"><%= earnings_driver.toFixed(2) %></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+                                    <div class="p-3 rounded" style="background: #e3f2fd; text-align: center;">
+                                        <small class="text-muted d-block mb-1">Paid Online</small>
+                                        <span class="invosymbol f-w-700 f-20" style="color: #1565c0;"><%= earnings_paid_online.toFixed(2) %></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+                                    <div class="p-3 rounded" style="background: #fce4ec; text-align: center;">
+                                        <small class="text-muted d-block mb-1">Wallet Deduction</small>
+                                        <span class="invosymbol f-w-700 f-20" style="color: #c62828;"><%= earnings_wallet.toFixed(2) %></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-lg-2 mb-3">
+                                    <div class="p-3 rounded" style="background: <%= rd.paid_status == '1' ? '#e8f5e9' : '#fff8e1' %>; text-align: center;">
+                                        <small class="text-muted d-block mb-1">Payment Status</small>
+                                        <% if (rd.paid_status == '1') { %>
+                                            <span class="badge badge-success f-14 p-1"><%=lan.Paid%></span>
+                                        <% } else { %>
+                                            <span class="badge badge-warning f-14 p-1">Pending</span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="col-sm-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div class="d-flex justify-content-center">
+                                <div style="padding: 15px 26px; border: 2px solid #5c61f2;">
+                                    <span class="f-16 f-w-600 mb-1 mt-2"><%=rd.pic_address.title%></span>
+                                    <p class="m-0 f-15"><%=rd.pic_address.subtitle%></p>
+                                </div>
+                            </div>
+                            <section class="cd-container" id="cd-timeline">
+                                <% let check = 0; %>
+                                <% rd.drop_address.forEach((data, i) => { %>
+                                    <% if (check == "0") { %>
+                                        <div class="cd-timeline-block">
+                                            <div class="cd-timeline-img cd-picture bg-primary"><i class="icon-location-pin f-22"></i></div>
+                                            <div class="cd-timeline-content p-4 <%= data.status %> border-2">
+                                                <span class="f-16 f-w-600 mb-0"><%=i+1%>. <%=data.title%></span>
+                                                <p class="m-0 f-w-400"><%=data.subtitle%></p>
+                                            </div>
+                                        </div>
+                                        <% check = 1; %>
+                                    <% } else { %>
+                                        <div class="cd-timeline-block">
+                                            <div class="cd-timeline-img cd-movie bg-primary"><i class="icon-location-pin f-22"></i></div>
+                                            <div class="cd-timeline-content p-4 <%= data.status %> border-2">
+                                                <span class="f-16 f-w-600 mb-0"><%=i+1%>. <%=data.title%></span>
+                                                <p class="m-0 f-w-400"><%=data.subtitle%></p>
+                                            </div>
+                                        </div>
+                                        <% check = 0; %>
+                                    <% }; %>
+                                <% }) %>
+                            </section>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div class="d-flex justify-content-center">
+                                <div style="padding: 15px 26px; border: 2px solid #5c61f2;">
+                                    <span class="timelinespan f-12 f-w-500 mb-1 mt-2"><%=rd.first_stime[0].time%></span>
+                                    <p class="m-0 f-16"><%=rd.first_stime[0].title%></p>
+                                </div>
+                            </div>
+                            <section class="cd-container" id="cd-timeline">
+                                <% let tcheck = 0; %>
+                                <% rd.second_stime.forEach((data, i) => { %>
+                                    <% if (tcheck == "0") { %>
+                                        <div class="cd-timeline-block">
+                                            <div class="cd-timeline-img cd-picture bg-primary"><i class="icon-location-pin f-22"></i></div>
+                                            <div class="cd-timeline-content p-3 <%= data.status %> border-2">
+                                                <span class="timelinespan f-12 f-w-500 mb-1 mt-2"><%=data.time%></span>
+                                                <p class="m-0 f-16"><%=data.title%></p>
+                                                <% if (data.addtit != "") { %>
+                                                    <p><%=data.addtit%></p>
+                                                <% }; %>
+                                                <% if (data.addubtit != "") { %>
+                                                    <p class="f-w-400 pt-0 mb-0"><%=data.addubtit%></p>
+                                                <% }; %>
+                                            </div>
+                                        </div>
+                                        <% tcheck = 1; %>
+                                    <% } else { %>
+                                        <div class="cd-timeline-block">
+                                            <div class="cd-timeline-img cd-movie bg-primary"><i class="icon-location-pin f-22"></i></div>
+                                            <div class="cd-timeline-content p-3 <%= data.status %> border-2">
+                                                <span class="timelinespan f-12 f-w-500 mb-1 mt-2"><%=data.time%></span>
+                                                <p class="m-0 f-16"><%=data.title%></p>
+                                                <% if (data.addtit != "") { %>
+                                                    <p><%=data.addtit%></p>
+                                                <% }; %>
+                                                <% if (data.addubtit != "") { %>
+                                                    <p class="f-w-400 pt-0 mb-0"><%=data.addubtit%></p>
+                                                <% }; %>
+                                            </div>
+                                        </div>
+                                        <% tcheck = 0; %>
+                                    <% }; %>
+                                <% }) %>
+                            </section>
+
+
+                            <!-- <div class="page pt-0" data-uia-timeline-skin="3" data-uia-timeline-adapter-skin-3="uia-card-skin-#1">
+                                        <div class="uia-timeline">
+                                            <div class="uia-timeline__container">
+                                                <div class="uia-timeline__line"></div>
+
+                                                <div class="uia-timeline__annual-sections">
+                                                    <span class="uia-timeline__year" aria-hidden="true">2008</span>
+                                                    <div class="uia-timeline__groups">
+
+                                                        <section class="uia-timeline__group" aria-labelledby="timeline-demo-1-heading-1">
+                                                            <div class="uia-timeline__point uia-card" data-uia-card-skin="1" data-uia-card-mod="1">
+                                                                <div class="uia-card__container">
+                                                                    <div class="uia-card__intro">
+                                                                        <h3 id="timeline-demo-1-heading-1" class="ra-heading ha-screen-reader">Philadelphia Museum School of Industrial Art</h3>
+                                                                        <span class="uia-card__time">
+                                                                            <time datetime="2008-02-02">
+                                                                                <span class="uia-card__day">2</span>
+                                                                                <span>February 2008</span>
+                                                                            </time>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="uia-card__body">
+                                                                        <div class="uia-card__description">
+                                                                            <p>Attends the Philadelphia Museum School of Industrial Art. Studies design with Alexey Brodovitch, art director at Harper's Bazaar, and works as his assistant.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="uia-timeline__annual-sections">
+                                                    <span class="uia-timeline__year" aria-hidden="true">2014</span>
+                                                    <div class="uia-timeline__groups">
+                                                        <section class="uia-timeline__group" aria-labelledby="timeline-demo-1-heading-3">
+                                                            <div class="uia-timeline__point uia-card" data-uia-card-skin="1" data-uia-card-mod="1">
+                                                                <div class="uia-card__container">
+                                                                    <div class="uia-card__intro">
+                                                                        <h3 id="timeline-demo-1-heading-3" class="ra-heading ha-screen-reader">My travel to Europe</h3>
+                                                                        <span class="uia-card__time">
+                                                                            <time datetime="2014-07-14">
+                                                                                <span class="uia-card__day">14</span>
+                                                                                <span>Jul<span class="ha-screen-reader">e 2014</span></span>
+                                                                            </time>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="uia-card__body">
+                                                                        <div class="uia-card__description">
+                                                                            <p>Travels to France, Italy, Spain, and Peru. After completing fashion editorial in Lima, prolongs stay to make portraits of local people in a daylight studio.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+    <script>
+    $(document).ready(function() {
+        // Initialize Bootstrap 5 tooltips for payment info icons
+        var tooltipEls = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipEls.forEach(function(el) {
+            new bootstrap.Tooltip(el);
+        });
+    });
+    </script>
+  </body>
+</html>

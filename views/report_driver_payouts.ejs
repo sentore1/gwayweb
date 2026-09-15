@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3>Driver Payouts Report</h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item active">Driver Payouts Report</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header col-12 pb-0">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label"><%=lan.start%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreports" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label"><%=lan.end%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreporte" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label">Driver</label>
+                                    <select class="js-example-basic-single" id="report_driver_id" style="width: 100%;">
+                                        <option value="0" selected>All Drivers</option>
+                                        <% drivers.forEach((val) => { %>
+                                            <option value="<%= val.id %>"><%= val.first_name %> <%= val.last_name %> (<%= val.primary_ccode %> <%= val.primary_phoneNo %>)</option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label">Status</label>
+                                    <select class="js-example-basic-single" id="report_payout_status" style="width: 100%;">
+                                        <option value="All" selected>All Statuses</option>
+                                        <option value="0">Pending</option>
+                                        <option value="1">Paid/Approved</option>
+                                        <option value="2">Rejected</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Driver Name</th>
+                                            <th>Amount Requested</th>
+                                            <th>Payout Method</th>
+                                            <th>Payout Details</th>
+                                            <th>Status</th>
+                                            <th>Receipt Proof</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="driver_payouts_report">
+                                        <% let i = 1 %>
+                                        <% rd.forEach((val) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td><%= val.dfname %> <%= val.dlname %> (<%= val.dccode %> <%= val.dphone %>)</td>
+                                                <td class="invosymbol"><%= val.amount %></td>
+                                                <td>
+                                                    <% if (val.p_type === '1') { %>
+                                                        UPI
+                                                    <% } else if (val.p_type === '2') { %>
+                                                        Paypal
+                                                    <% } else if (val.p_type === '3') { %>
+                                                        BANK Transfer
+                                                    <% } else { %>
+                                                        <%= val.p_type %>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (val.p_type === '1') { %>
+                                                        UPI ID: <%= val.upi_id %>
+                                                    <% } else if (val.p_type === '2') { %>
+                                                        Paypal ID: <%= val.paypal_id %>
+                                                    <% } else if (val.p_type === '3') { %>
+                                                        Bank: <%= val.bank_no %> | IFSC: <%= val.bank_ifsc %> | Type: <%= val.bank_type %>
+                                                    <% } else { %>
+                                                        -
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (val.status == '0') { %>
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    <% } else if (val.status == '1') { %>
+                                                        <span class="badge badge-success">Approved</span>
+                                                    <% } else { %>
+                                                        <span class="badge badge-danger">Rejected</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (val.status == '1') { %>
+                                                        <% if (val.image && val.image != '' && val.image != 'null') { %>
+                                                            <a href="javascript:void(0)" class="view-proof-image" data-img="../../<%= val.image %>"><img src="../../<%= val.image %>" width="30" height="30" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" alt="Proof"></a>
+                                                        <% } else { %>
+                                                            <span class="text-muted custom_tooltip" style="cursor: help;">Justified<span class="tooltiptext" style="width: 150px; margin-left: -75px; padding: 5px; font-size: 11px; bottom: 135%;"><%= val.justification_note || 'No receipt uploaded' %></span></span>
+                                                        <% } %>
+                                                    <% } else if (val.status == '2') { %>
+                                                        <span class="text-danger custom_tooltip" style="cursor: help;">Reason<span class="tooltiptext" style="width: 150px; margin-left: -75px; padding: 5px; font-size: 11px; bottom: 135%;"><%= val.rejection_reason || 'No reason provided' %></span></span>
+                                                    <% } else { %>
+                                                        -
+                                                    <% } %>
+                                                </td>
+                                                <td><%= val.date %></td>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 text-end form-group">
+                                <button class="btn btn-square btn-primary b-r-10" id="down_driver_payouts_report" style="margin-top: 30px;" type="button">Download Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+    <!-- Receipt Lightbox Modal -->
+    <div class="modal fade" id="receiptLightboxModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Receipt Proof</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="lightbox_image" src="" style="max-width: 100%; max-height: 450px; object-fit: contain;" alt="Receipt Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+    <script>
+        $(document).on("click", ".view-proof-image", function(){
+            let img = $(this).data("img");
+            $("#lightbox_image").attr("src", img);
+            $("#receiptLightboxModal").modal("show");
+        });
+    </script>
+  </body>
+</html>

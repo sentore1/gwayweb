@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3><%=lan.Payout%> <%=lan.List%></h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><%=lan.Dashboard%></li>
+                    <li class="breadcrumb-item active"><%=lan.Payout%> <%=lan.List%></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th><%=lan.Payment%> <%=lan.Image%></th>
+                                            <th><%=lan.Date%></th>
+                                            <th><%=lan.Amount%></th>
+                                            <th><%=lan.Email%></th>
+                                            <th><%=lan.Payout%> <%=lan.Type%></th>
+                                            <% let permissions = per != "1" ? per.payout_list[1] : "1" %>
+                                            <% if(permissions == "1"){ %>
+                                            <th><%=lan.Status%></th>
+                                            <% } %>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                      <% var i = 1 %>
+                                        <% payout_list.forEach((data) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td class="p-1">
+                                                  <% if(data.image != ""){ %>
+                                                    <a href="../../<%= data.image %>" onclick="openLightbox(this.href); return false;"><img width="50px" height="50px" src="../../<%= data.image %>" alt="image"></a>
+                                                  <% }; %>
+                                                </td>
+                                                <td><%= data.date %></td>
+                                                <td class="invosymbol"><%= data.amount %></td>
+                                                <td><%= data.dri_email %></td>
+                                                <td>
+                                                  <% if(data.p_type == "1"){ %>
+                                                    <span><%=lan.UPI%> <i class="fa fa-info-circle ml-1" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= data.upi_id %>"></i></span>
+                                                  <% } else if (data.p_type == "2") { %>
+                                                    <span><%=lan.Paypal%> <i class="fa fa-info-circle ml-1" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= data.paypal_id %>"></i></span>
+                                                  <% } else if (data.p_type == "3") { %>
+                                                    <span><%=lan.Bank_Transfer%> <i class="fa fa-info-circle ml-1" style="cursor: pointer;" data-bs-toggle="tooltip" title="Bank A/C: <%= data.bank_no %>&#10;IFSC: <%= data.bank_ifsc %>&#10;Type: <%= data.bank_type %>"></i></span>
+                                                  <% }; %>
+                                                </td>
+                                                <% if(permissions == "1"){ %>
+                                                <td>
+                                                  <% if(data.status == "0"){ %>
+                                                    <button class="btn btn-square btn-warning p-1 px-2" data-bs-toggle="modal" data-bs-target="#complete_payment" id="complete_wpayment" data-id="<%= data.id %>"
+                                                        data-p_type="<%= data.p_type %>" data-upi_id="<%= data.upi_id %>" data-paypal_id="<%= data.paypal_id %>" data-bank_no="<%= data.bank_no %>"
+                                                        data-bank_ifsc="<%= data.bank_ifsc %>" data-bank_type="<%= data.bank_type %>"><%=lan.Action%></button>
+                                                  <% } else if(data.status == "2") { %>
+                                                    <span class="badge badge-danger p-1 px-2" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= data.rejection_reason || 'No reason provided' %>">Rejected <i class="fa fa-info-circle ml-1"></i></span>
+                                                  <% } else { %>
+                                                    <span class="badge badge-success p-1 px-2" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="<%= data.justification_note || 'Completed with proof image' %>">Complete <i class="fa fa-info-circle ml-1"></i></span>
+                                                  <% }; %>
+                                                </td>
+                                                <% } %>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+        <div class="modal fade" id="complete_payment" tabindex="-1" role="dialog" aria-labelledby="complete_payment" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%=lan.Payment%> <%=lan.Detail%></h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="<%=lan.Close%>"></button>
+                    </div>
+                    <form  class="needs-validation" id="petsize_edit_form" novalidate="" action="/settings/add_wpayment" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="row g-3">
+
+                                <div class="col-12 d-none" id="pay_urp">
+                                    <h5><%=lan.UPI%> <%=lan.Id%> :- <span class="f-w-400 pupi_data"></span></h5>
+                                </div>
+                                
+                                <div class="col-12 d-none" id="pay_paypal">
+                                    <h5><%=lan.Paypal%> <%=lan.Id%> :- <span class="f-w-400 ppaypal_data"></span></h5>
+                                </div>
+
+                                <div class="col-12 d-none" id="pay_account">
+                                    <h5><%=lan.Bank%> <%=lan.Account%> <%=lan.No%> :- <span class="f-w-400 pbankac_data"></span></h5>
+                                    <h5 class="mt-2"><%=lan.IFSC%> <%=lan.Code%> :- <span class="f-w-400 pifsc_data"></span></h5>
+                                    <h5 class="mt-2"><%=lan.Bank%> <%=lan.Account%> <%=lan.Type%> :- <span class="f-w-400 pactype_data"></span></h5>
+                                </div>
+
+                                 <div class="col-12 form-group border-top pt-3">
+                                     <label class="col-form-label">Status</label>
+                                     <select class="form-control" name="status" id="payout_status_select" required>
+                                         <option value="1">Approve</option>
+                                         <option value="2">Reject</option>
+                                     </select>
+                                 </div>
+
+                                 <div class="col-12 form-group d-none" id="payout_rejection_container">
+                                     <label class="col-form-label">Rejection Reason</label>
+                                     <textarea class="form-control" name="rejection_reason" id="payout_rejection_reason" placeholder="Enter reason for rejecting payout request"></textarea>
+                                 </div>
+
+                                 <div id="payout_approve_container" class="col-12 p-0">
+                                     <div class="col-12 text-center mb-0 form-group">
+                                        <img id="file-preview" width="150" height="150" src="../images/dashboard/default/profile.png" alt="<%=lan.image_preview_alt%>">
+                                    </div>
+                                    <div class="col-12 mt-0 form-group">
+                                        <label class="col-form-label"><%=lan.Upload%> <%=lan.img%></label>
+                                        <input class="form-control" style="height: 47px;" type="file" name="image" onchange="showPreview(event)">
+                                    </div>
+                                    <div class="col-12 form-group" id="justification_container">
+                                        <label class="col-form-label">Proofless Justification Note</label>
+                                        <textarea class="form-control" name="justification_note" id="justification_note" placeholder="Provide note/reason if not uploading a receipt image (e.g. UPI settlement verified manually)"></textarea>
+                                    </div>
+                                 </div>
+                                 <input type="hidden" id="payment_sid" name="payment_sid" value="">
+                             </div>
+                         </div>
+                         <div class="modal-footer">
+                             <button class="btn btn-secondary" type="button" data-bs-dismiss="modal"><%=lan.Close%></button>
+                             <button class="btn btn-primary" type="submit"><%=lan.Save%></button>
+                         </div>
+                     </form>
+                 </div>
+             </div>
+         </div>
+
+         <script>
+         document.addEventListener("DOMContentLoaded", function() {
+             const statusSelect = document.getElementById("payout_status_select");
+             const rejectionContainer = document.getElementById("payout_rejection_container");
+             const rejectionReason = document.getElementById("payout_rejection_reason");
+             const approveContainer = document.getElementById("payout_approve_container");
+
+             function toggleContainers() {
+                 if (statusSelect.value === "2") {
+                     // Reject
+                     rejectionContainer.classList.remove("d-none");
+                     rejectionReason.required = true;
+                     approveContainer.classList.add("d-none");
+                 } else {
+                     // Approve
+                     rejectionContainer.classList.add("d-none");
+                     rejectionReason.required = false;
+                     approveContainer.classList.remove("d-none");
+                 }
+             }
+
+             statusSelect.addEventListener("change", toggleContainers);
+
+             // Initial check when modal opens/resets
+             $(document).on('click', '#complete_wpayment', function() {
+                 statusSelect.value = "1";
+                 toggleContainers();
+             });
+         });
+         </script>
+
+        <!-- Lightbox Modal for Document/Receipt Preview -->
+        <div class="modal fade" id="imageLightboxModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1070;">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content" style="background-color: rgba(15, 23, 42, 0.95); border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+                    <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 25px;">
+                        <h5 class="modal-title" style="color: #fff; font-weight: 600; font-family: 'Montserrat', sans-serif;">Document Preview</h5>
+                        <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-column align-items-center justify-content-center" style="position: relative; min-height: 500px; padding: 25px; background: radial-gradient(circle, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%);">
+                        <!-- Image Wrapper with Zoom / Pan / Rotation -->
+                        <div id="lightboxImageWrapper" style="display: flex; align-items: center; justify-content: center; max-width: 100%; max-height: 65vh; transition: all 0.3s ease;">
+                            <img id="lightboxImage" src="" alt="Document Preview" style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);">
+                        </div>
+                        
+                        <!-- Floating Controls Toolbar -->
+                        <div class="d-flex gap-3 mt-4 px-4 py-2" style="background: rgba(30, 41, 59, 0.7); border-radius: 50px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                            <button type="button" class="btn rounded-circle control-btn" id="btnZoomIn" title="Zoom In">
+                                <i class="fa fa-search-plus"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnZoomOut" title="Zoom Out">
+                                <i class="fa fa-search-minus"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnRotateLeft" title="Rotate Left 90°">
+                                <i class="fa fa-undo"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnRotateRight" title="Rotate Right 90°">
+                                <i class="fa fa-repeat"></i>
+                            </button>
+                            <button type="button" class="btn rounded-circle control-btn" id="btnReset" title="Reset View">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentRotation = 0;
+            let currentZoom = 1;
+
+            function openLightbox(imageSrc) {
+                if (!imageSrc || imageSrc.includes('profile.png')) return;
+                currentRotation = 0;
+                currentZoom = 1;
+                updateTransform();
+                $('#lightboxImage').attr('src', imageSrc);
+                var myModal = new bootstrap.Modal(document.getElementById('imageLightboxModal'));
+                myModal.show();
+            }
+
+            function updateTransform() {
+                $('#lightboxImage').css('transform', `rotate(${currentRotation}deg) scale(${currentZoom})`);
+            }
+
+            $(document).ready(function() {
+                // Lightbox toolbar buttons
+                $('#btnZoomIn').on('click', function() {
+                    currentZoom = Math.min(3, currentZoom + 0.25);
+                    updateTransform();
+                });
+
+                $('#btnZoomOut').on('click', function() {
+                    currentZoom = Math.max(0.5, currentZoom - 0.25);
+                    updateTransform();
+                });
+
+                $('#btnRotateLeft').on('click', function() {
+                    currentRotation = (currentRotation - 90) % 360;
+                    updateTransform();
+                });
+
+                $('#btnRotateRight').on('click', function() {
+                    currentRotation = (currentRotation + 90) % 360;
+                    updateTransform();
+                });
+
+                $('#btnReset').on('click', function() {
+                    currentRotation = 0;
+                    currentZoom = 1;
+                    updateTransform();
+                });
+            });
+        </script>
+
+        <style>
+            .control-btn {
+                width: 44px;
+                height: 44px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.15) !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                transition: all 0.2s ease-in-out;
+                cursor: pointer;
+            }
+            .control-btn i {
+                color: #ffffff !important;
+                font-size: 16px;
+            }
+            .control-btn:hover {
+                background: rgba(255, 255, 255, 0.3) !important;
+                transform: scale(1.08);
+                border-color: rgba(255, 255, 255, 0.4) !important;
+            }
+            .control-btn:active {
+                transform: scale(0.95);
+            }
+        </style>
+
+     <%- include('./partials/footer'); -%>
+     <%- include('./partials/script'); -%>
+   </body>
+ </html>

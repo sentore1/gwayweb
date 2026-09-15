@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3><%= lan.all %> <%= lan.rides %> <%= lan.list %></h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><%= lan.dashboard %></li>
+                    <li class="breadcrumb-item active"><%= lan.all %> <%= lan.rides %> <%= lan.list %></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Quick Filters -->
+                            <div class="mb-4 d-flex align-items-center flex-wrap gap-2" style="background-color: #f8f9fa; padding: 12px 16px; border-radius: 8px; border: 1px solid #e6edef;">
+                                <h6 class="mb-0 f-w-600 text-muted d-flex align-items-center" style="margin-right: 15px; font-size: 14px; color: #59667a !important;">
+                                    <i data-feather="filter" style="width: 16px; height: 16px; margin-right: 6px; color: #7366ff; stroke-width: 2.5px;"></i>Quick Filters:
+                                </h6>
+                                <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">
+                                    <a href="/rides/all" class="btn <%= !selectedFilter ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= !selectedFilter ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px; margin-right: 4px;">All</a>
+                                    <a href="/rides/all?filter=today" class="btn <%= selectedFilter === 'today' ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= selectedFilter === 'today' ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px; margin-right: 4px;">Today</a>
+                                    <a href="/rides/all?filter=this_week" class="btn <%= selectedFilter === 'this_week' ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= selectedFilter === 'this_week' ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px; margin-right: 4px;">This Week</a>
+                                    <a href="/rides/all?filter=running" class="btn <%= selectedFilter === 'running' ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= selectedFilter === 'running' ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px; margin-right: 4px;">Running</a>
+                                    <a href="/rides/all?filter=payment_pending" class="btn <%= selectedFilter === 'payment_pending' ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= selectedFilter === 'payment_pending' ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px; margin-right: 4px;">Payment Pending</a>
+                                    <a href="/rides/all?filter=completed" class="btn <%= selectedFilter === 'completed' ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= selectedFilter === 'completed' ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px; margin-right: 4px;">Completed</a>
+                                    <a href="/rides/all?filter=cancelled" class="btn <%= selectedFilter === 'cancelled' ? 'btn-primary text-white' : 'btn-light text-dark' %> px-3 py-1 b-r-5 f-12 f-w-600" style="border: 1px solid <%= selectedFilter === 'cancelled' ? '#7366ff' : '#dee2e6' %>; text-transform: none; display: inline-flex; align-items: center; justify-content: center; height: 28px;">Cancelled</a>
+                                </div>
+                            </div>
+                            <%- include('./partials/table_skeleton'); -%>
+                            <div class="real-table-wrapper dt-loading">
+                                <div class="table-responsive theme-scrollbar">
+                                    <table class="display" id="basic-1">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th><%= lan.rider %></th>
+                                                <th><%= lan.driver %></th>
+                                                <th><%= lan.pickup %> <%= lan.location %></th>
+                                                <th><%= lan.destination %></th>
+                                                <th><%= lan.ride %> <%= lan.fare %></th>
+                                                <th><%= lan.module %> <%= lan.type %></th>
+                                                <th><%= lan.status %></th>
+                                                <th><%= lan.action %></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% var i = 1 %>
+                                            <% rd.forEach((data) => { %>
+                                                <tr>
+                                                    <td><%= i %></td>
+                                                    <td><%= data.cname %></td>
+                                                    <td><%= data.dfname %> <%= data.dlname %></td>
+                                                    <td>
+                                                        <%= data.pic_address.length < 40 ? data.pic_address : data.pic_address.slice(0, 40) + '...' %>
+                                                    </td>
+                                                    <td>
+                                                        <%= data.drop_address.length < 40 ? data.drop_address : data.drop_address.slice(0, 40) + '...' %>
+                                                    </td>
+                                                    <td class="invosymbol"><%= data.price %></td>
+                                                    <td><%= data.mode_title%></td>
+                                                    <td>
+                                                        <% if (data.status == '0') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.new_ride %></span>
+                                                        <% } else if (data.status == '1') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.accept_ride %></span>
+                                                        <% } else if (data.status == '2') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.arrived_at_the_location %></span>
+                                                        <% } else if (data.status == '3') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.confirm_ride %></span>
+                                                        <% } else if (data.status == '4') { %>
+                                                            <span class="badge badge-danger p-2"><%= lan.ride_cancel %></span>
+                                                        <% } else if (data.status == '5') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.ride_start %></span>
+                                                        <% } else if (data.status == '6') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.ride_end %></span>
+                                                        <% } else if (data.status == '7') { %>
+                                                            <span class="badge badge-warning p-2"><%= lan.waiting_payment %></span>
+                                                        <% } else if (data.status == '8') { %>
+                                                            <span class="badge badge-success p-2"><%= lan.complete %></span>
+                                                        <% }; %>
+                                                    </td>
+                                                    <td style="white-space: nowrap; vertical-align: middle;">
+                                                        <a class="dropbtn btn-primary px-2 py-1 b-r-5 f-12 f-w-400" href="/rides/alldetail?u=<%= data.req_id %>&c=<%= data.c_id %>&s=<%= data.rides %>" style="display: inline-block; vertical-align: middle;"><%= lan.details %></a>
+                                                        <% if (data.d_id && data.d_id != 0) { %>
+                                                            <a class="dropbtn btn-success px-2 py-1 b-r-5 f-12 f-w-400 ms-1" href="/public/track/<%= data.tracking_token %>" target="_blank" style="display: inline-block; vertical-align: middle;">
+                                                                <i data-feather="map" style="width: 12px; height: 12px; stroke-width: 2.5px; vertical-align: -1px; margin-right: 2px;"></i>Track
+                                                            </a>
+                                                            <button class="dropbtn btn-warning px-2 py-1 b-r-5 f-12 f-w-400 ms-1" onclick="copyTrackingLink(this, '<%= data.tracking_token %>')" style="display: inline-block; vertical-align: middle; color: white; border: none; padding: 4px 8px;">
+                                                                <i data-feather="copy" style="width: 12px; height: 12px; stroke-width: 2.5px; vertical-align: -1px; margin-right: 2px;"></i>Copy
+                                                            </button>
+                                                        <% } %>
+                                                    </td>
+                                                </tr>
+                                            <% i++ %>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+    <script>
+      function copyTrackingLink(btn, token) {
+          const url = window.location.origin + '/public/track/' + token;
+          navigator.clipboard.writeText(url).then(() => {
+              const originalHTML = btn.innerHTML;
+              btn.innerHTML = '<i data-feather="check" style="width: 12px; height: 12px; stroke-width: 2.5px; vertical-align: -1px; margin-right: 2px;"></i>Copied!';
+              btn.classList.replace('btn-warning', 'btn-success');
+              if (typeof feather !== 'undefined') feather.replace();
+              
+              setTimeout(() => {
+                  btn.innerHTML = originalHTML;
+                  btn.classList.replace('btn-success', 'btn-warning');
+                  if (typeof feather !== 'undefined') feather.replace();
+              }, 2000);
+          }).catch(err => {
+              console.error('Could not copy tracking link: ', err);
+          });
+      }
+    </script>
+  </body>
+</html>

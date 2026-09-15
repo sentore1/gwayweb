@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <%- include('./partials/head'); -%>
+    
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+    <!-- tap on top starts-->
+
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                    <h3><%=lan.Coupon%> <%=lan.List%></h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                        <li class="breadcrumb-item"><%=lan.Dashboard%></li>
+                        <li class="breadcrumb-item active"><%=lan.Document%> <%=lan.Coupon%></li>
+                    </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <% let permiss = per != "1" ? per.coupon[1] : "1" %>
+                        <% if(permiss == "1"){ %>
+                        <div class="card-header d-flex justify-content-end pb-0">
+                            <button class="btn btn-square btn-primary b-r-10" type="button" data-bs-toggle="modal" data-bs-target="#add_coupon"><%=lan.Add%> <%=lan.Coupon%></button>
+                        </div>
+                        <% } %>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th><%= lan.hash %></th>
+                                            <th><%=lan.Title%></th>
+                                            <th><%=lan.Coupon%> <%=lan.Code%></th>
+                                            <th><%=lan.Minimum%> <%=lan.Ride%> <%=lan.amount%></th>
+                                            <th><%=lan.Ride%> <%=lan.Discount%></th>
+                                            <th><%=lan.Start%> <%=lan.Date%></th>
+                                            <th><%=lan.End%> <%=lan.Date%></th>
+                                            <% let permissions = per != "1" ? per.coupon[2] : "1" %>
+                                            <% if(permissions == "1"){ %>
+                                            <th><%=lan.Action%></th>
+                                            <% } %>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% var i = 1 %>
+                                        <% coupon_list.forEach((data) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td><%= data.title %></td>
+                                                <td><%= data.code %></td>
+                                                <td class="invosymbol"><%= data.min_amount %></td>
+                                                <td class="invosymbol"><%= data.discount_amount %></td>
+                                                <td>
+                                                    <% let start_date_date = new Date(data.start_date) %>
+                                                    <% let start_date_day = (start_date_date.getDate() < 10 ? '0' + parseInt(start_date_date.getDate()) : start_date_date.getDate()) %>
+                                                    <% let start_date_month = (start_date_date.getMonth()+1 < 10 ? '0' + parseInt(start_date_date.getMonth()+1) : start_date_date.getMonth()+1) %>
+                                                    <% let start_date_year = start_date_date.getFullYear() %>
+                                                    <% let start_date = `${start_date_day}-${start_date_month}-${start_date_year}` %>
+                                                    <%= start_date %>
+                                                </td>
+                                                <td>
+                                                    <% let end_date_date = new Date(data.end_date) %>
+                                                    <% let end_date_day = (end_date_date.getDate() < 10 ? '0' + parseInt(end_date_date.getDate()) : end_date_date.getDate()) %>
+                                                    <% let end_date_month = (end_date_date.getMonth()+1 < 10 ? '0' + parseInt(end_date_date.getMonth()+1) : end_date_date.getMonth()+1) %>
+                                                    <% let end_date_year = end_date_date.getFullYear() %>
+                                                    <% let end_date = `${end_date_day}-${end_date_month}-${end_date_year}` %>
+                                                    <%= end_date %>
+                                                </td>
+                                                <% if(permissions == "1"){ %>
+                                                <td> 
+                                                    <ul class="action"> 
+                                                        <li class="edit custom_tooltip"><a data-bs-toggle="modal" data-bs-target="#edit_couponmodal" id="edit_coupon" data-id="<%= data.id %>" data-sub_title="<%= data.sub_title %>"
+                                                            data-title="<%= data.title %>" data-code="<%= data.code %>" data-min_amount="<%= data.min_amount %>" data-discount_amount="<%= data.discount_amount %>"
+                                                            data-start_date="<%= data.start_date %>" data-end_date="<%= data.end_date %>"><i class="icon-pencil-alt"></i></a><span class="tooltiptext" style="width: 100px; margin-left: -50px; padding: 5px; font-size: 11px; bottom: 135%;">Edit Coupon</span></li>
+                                                        <li class="delete custom_tooltip"><a href="/coupon/delete/<%= data.id %>"><i class="icon-trash"></i></a><span class="tooltiptext" style="width: 100px; margin-left: -50px; padding: 5px; font-size: 11px; bottom: 135%;">Delete Coupon</span></li>
+                                                    </ul>
+                                                </td>
+                                                <% } %>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+
+
+        <div class="modal fade bd-example-modal-lg" id="add_coupon" tabindex="-1" role="dialog" aria-labelledby="add_coupon" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%=lan.Add%> <%=lan.Coupon%></h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="<%= lan.Close %>"></button>
+                    </div>
+                    <form  class="needs-validation" novalidate="" action="/coupon/add_coupon" method="post">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                                    <label class="form-label"><%=lan.Coupon%> <%=lan.Title%></label>
+                                    <input class="form-control" type="text" name="title" placeholder="<%=lan.Enter%> <%=lan.Coupon%> <%=lan.Title%>" required>
+                                </div>
+                                <div class="col-sm-5 col-md-3 col-lg-3 col-xl-4">
+                                    <label class="form-label"><%=lan.Coupon%> <%=lan.Code%></label>
+                                    <input class="form-control" type="text" name="code" id="add_coupon_code" placeholder="<%=lan.Enter%> <%=lan.Coupon%> <%=lan.Code%>" required>
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-lg-3 col-xl-4 pt-1">
+                                    <button class="btn btn-square b-r-5 btn-primary mt-4 gen_code" type="button"><%=lan.Generated%> <%=lan.Code%></button>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label class="form-label"><%=lan.Coupon%> <%=lan.Sub%> <%=lan.Title%></label>
+                                    <input class="form-control" type="text" name="sub_title" placeholder="<%=lan.Enter%> <%=lan.Coupon%> <%=lan.Sub%> <%=lan.Title%>" required>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label class="form-label">Service Restrictions (Select services to restrict this coupon from)</label>
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="restrictions" value="regular" id="restrict_regular">
+                                            <label class="form-check-label" for="restrict_regular">Regular Ride</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="restrictions" value="outstation" id="restrict_outstation">
+                                            <label class="form-check-label" for="restrict_outstation">Outstation</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="restrictions" value="rental" id="restrict_rental">
+                                            <label class="form-check-label" for="restrict_rental">Rental</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="restrictions" value="package" id="restrict_package">
+                                            <label class="form-check-label" for="restrict_package">Package</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Start%> <%=lan.Date%></label>
+                                    <input class="form-control" type="date" name="start_date" required>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Expire%> <%=lan.Date%></label>
+                                    <input class="form-control" type="date" name="end_date" required>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Minmum%> <%=lan.Ride%> <%=lan.amount%></label>
+                                    <input class="form-control" type="number" step="any" name="min_amount" placeholder="<%=lan.Enter%> <%=lan.Minmum%> <%=lan.Ride%> <%=lan.amount%>" required>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Ride%> <%=lan.Discount%></label>
+                                    <input class="form-control" type="number" step="any" name="discount_amount" placeholder="<%=lan.Enter%> <%=lan.Ride%> <%=lan.Discount%>" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal"><%=lan.Close%></button>
+                            <button class="btn btn-primary" type="submit"><%=lan.Save%></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade bd-example-modal-lg" id="edit_couponmodal" tabindex="-1" role="dialog" aria-labelledby="edit_couponmodal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%=lan.Edit%> <%=lan.Coupon%></h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="<%= lan.Close %>"></button>
+                    </div>
+                    <form  class="needs-validation" id="coupon_edit_form" novalidate="" action="" method="post">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                                    <label class="form-label"><%=lan.Coupon%> <%=lan.Title%></label>
+                                    <input class="form-control" type="text" id="edit_title" name="title" placeholder="<%=lan.Enter%> <%=lan.Coupon%> <%=lan.Title%>" required>
+                                </div>
+                                <div class="col-sm-5 col-md-3 col-lg-3 col-xl-4">
+                                    <label class="form-label"><%=lan.Coupon%> <%=lan.Code%></label>
+                                    <input class="form-control edit_code" type="text" name="code" id="edit_coupon_code" placeholder="<%=lan.Enter%> <%=lan.Coupon%> <%=lan.Code%>" required>
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-lg-3 col-xl-4 pt-1">
+                                    <button class="btn btn-square b-r-5 btn-primary mt-4 gen_code" type="button"><%=lan.Generated%> <%=lan.Code%></button>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label class="form-label"><%=lan.Coupon%> <%=lan.Sub%> <%=lan.Title%></label>
+                                    <input class="form-control" type="text" id="edit_subtitle" name="sub_title" placeholder="<%=lan.Enter%> <%=lan.Coupon%> <%=lan.Sub%> <%=lan.Title%>" required>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label class="form-label">Service Restrictions (Select services to restrict this coupon from)</label>
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_restrictions" value="regular" id="edit_restrict_regular">
+                                            <label class="form-check-label" for="edit_restrict_regular">Regular Ride</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_restrictions" value="outstation" id="edit_restrict_outstation">
+                                            <label class="form-check-label" for="edit_restrict_outstation">Outstation</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_restrictions" value="rental" id="edit_restrict_rental">
+                                            <label class="form-check-label" for="edit_restrict_rental">Rental</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="edit_restrictions" value="package" id="edit_restrict_package">
+                                            <label class="form-check-label" for="edit_restrict_package">Package</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Start%> <%=lan.Date%></label>
+                                    <input class="form-control" type="date" id="edit_start" name="start_date" required>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Expire%> <%=lan.Date%></label>
+                                    <input class="form-control" type="date" id="edit_end" name="end_date" required>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Minmum%> <%=lan.Ride%> <%=lan.amount%></label>
+                                    <input class="form-control" type="number" step="any" id="edit_minimuma" name="min_amount" placeholder="<%=lan.Enter%> <%=lan.Minmum%> <%=lan.Ride%> <%=lan.amount%>" required>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                    <label class="form-label"><%=lan.Ride%> <%=lan.Discount%></label>
+                                    <input class="form-control" type="number" step="any" id="edit_discounta" name="discount_amount" placeholder="<%=lan.Enter%> <%=lan.Ride%> <%=lan.Discount%>" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal"><%=lan.Close%></button>
+                            <button class="btn btn-primary" type="submit"><%=lan.Save%></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.gen_code', function (e) {
+                e.preventDefault();
+                let randomCode = '';
+                let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                for (let i = 0; i < 6; i++) {
+                    randomCode += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                $(this).closest('form').find('input[name="code"]').val(randomCode);
+                return false;
+            });
+
+            // Prevent caching and execute latest code for edit coupon modal
+            $(document).off('click', '#edit_coupon').on('click', '#edit_coupon', function(){
+                let { id, title, sub_title, code, min_amount, discount_amount, start_date, end_date } = $(this).data();
+                
+                $('#coupon_edit_form').attr('action', '/coupon/edit_coupon/' + id);
+                $('#edit_title').val(title);
+                
+                let displaySubtitle = sub_title || "";
+                let restrictions = [];
+                if (displaySubtitle.includes("||")) {
+                    let parts = displaySubtitle.split("||");
+                    displaySubtitle = parts[0];
+                    restrictions = (parts[1] || "").split(",");
+                }
+                $('#edit_subtitle').val(displaySubtitle);
+                
+                // Reset all edit restrictions checkboxes
+                $('input[name="edit_restrictions"]').prop('checked', false);
+                // Check the ones that are in the restrictions list
+                restrictions.forEach(function(r) {
+                    $('input[name="edit_restrictions"][value="' + r.trim() + '"]').prop('checked', true);
+                });
+                
+                $('.edit_code').val(code);
+                
+                let start_date_date = new Date(start_date);
+                let start_date_day = (start_date_date.getDate() < 10 ? '0' + parseInt(start_date_date.getDate()) : start_date_date.getDate());
+                let start_date_month = (start_date_date.getMonth()+1 < 10 ? '0' + parseInt(start_date_date.getMonth()+1) : start_date_date.getMonth()+1);
+                let start_date_year = start_date_date.getFullYear();
+                let start_dates = `${start_date_year}-${start_date_month}-${start_date_day}`;
+                $('#edit_start').val(start_dates);
+          
+                let end_date_date = new Date(end_date);
+                let end_date_day = (end_date_date.getDate() < 10 ? '0' + parseInt(end_date_date.getDate()) : end_date_date.getDate());
+                let end_date_month = (end_date_date.getMonth()+1 < 10 ? '0' + parseInt(end_date_date.getMonth()+1) : end_date_date.getMonth()+1);
+                let end_date_year = end_date_date.getFullYear();
+                let end_dates = `${end_date_year}-${end_date_month}-${end_date_day}`;
+                $('#edit_end').val(end_dates);
+          
+                $('#edit_minimuma').val(min_amount);
+                $('#edit_discounta').val(discount_amount);
+            });
+        });
+    </script>
+    </body>
+</html>

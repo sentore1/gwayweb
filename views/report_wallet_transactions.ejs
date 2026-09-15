@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3>Wallet Transactions Report</h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item active">Wallet Transactions Report</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header col-12 pb-0">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label"><%=lan.start%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreports" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label"><%=lan.end%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreporte" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label">Customer</label>
+                                    <select class="js-example-basic-single" id="report_customer_id" style="width: 100%;">
+                                        <option value="0" selected>All Customers</option>
+                                        <% customers.forEach((val) => { %>
+                                            <option value="<%= val.id %>"><%= val.name %> (<%= val.country_code %> <%= val.phone %>)</option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label">Status</label>
+                                    <select class="form-control" id="report_status" style="height: 45px;">
+                                        <option value="all" selected>All Statuses</option>
+                                        <option value="0">Pending Approval</option>
+                                        <option value="1">Success</option>
+                                        <option value="2">Rejected / Failed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Transaction ID</th>
+                                            <th>Customer Name</th>
+                                            <th>Payment Method</th>
+                                            <th>Amount Deposited</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Proof / Reason</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="wallet_transactions_report">
+                                        <% let i = 1 %>
+                                        <% rd.forEach((val) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td>#<%= val.id %></td>
+                                                <td><%= val.cname %> (<%= val.country_code %> <%= val.phone %>)</td>
+                                                <td><%= val.pay_name %></td>
+                                                <td class="invosymbol"><%= val.amount %></td>
+                                                <td><%= val.date %></td>
+                                                <td>
+                                                    <% if (val.status === '0') { %>
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    <% } else if (val.status === '1') { %>
+                                                        <span class="badge bg-success">Success</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (val.payment_proof) { %>
+                                                        <a href="../../<%= val.payment_proof %>" target="_blank" class="btn btn-xs btn-outline-info">View Proof</a>
+                                                    <% } else if (val.status === '2' && val.rejection_reason) { %>
+                                                        <span class="text-danger" title="<%= val.rejection_reason %>"><%= val.rejection_reason %></span>
+                                                    <% } else { %>
+                                                        -
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (val.status === '0') { %>
+                                                        <div class="d-flex gap-2">
+                                                            <form action="/report/wallet_transaction_action" method="POST" class="d-inline">
+                                                                <input type="hidden" name="transaction_id" value="<%= val.id %>">
+                                                                <input type="hidden" name="action_status" value="approve">
+                                                                <button type="submit" class="btn btn-xs btn-success text-white">Approve</button>
+                                                            </form>
+                                                            <button type="button" class="btn btn-xs btn-danger text-white btn-reject" data-id="<%= val.id %>">Reject</button>
+                                                        </div>
+                                                    <% } else { %>
+                                                        -
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 text-end form-group">
+                                <button class="btn btn-square btn-primary b-r-10" id="down_wallet_transactions_report" style="margin-top: 30px;" type="button">Download Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+  </body>
+</html>

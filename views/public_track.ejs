@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= general.title || 'ZippyGo' %> - Live Ride Tracking</title>
+    <link rel="icon" href="/<%= general.light_image %>" type="image/x-icon">
+    <link rel="shortcut icon" href="/<%= general.light_image %>" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #map {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .status-card {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 40%;
+            overflow-y: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .status-badge {
+            background-color: #0284c7;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .driver-panel {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #0ea5e9;
+            background-color: #334155;
+        }
+        .driver-info {
+            flex-grow: 1;
+        }
+        .driver-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        .vehicle-info {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+        .route-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .address-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .dot {
+            font-size: 18px;
+            line-height: 1;
+            margin-top: 2px;
+        }
+        .dot-pickup { color: #22c55e; }
+        .dot-drop { color: #ef4444; }
+        .address-text {
+            color: #cbd5e1;
+            line-height: 1.4;
+        }
+        .privacy-alert {
+            font-size: 11px;
+            color: #64748b;
+            text-align: center;
+            margin-top: 5px;
+        }
+        /* Mobile vs Desktop Layout optimization */
+        @media(min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
+            #map {
+                width: 70%;
+            }
+            .status-card {
+                width: 30%;
+                height: 100vh;
+                max-height: 100%;
+                border-top: none;
+                border-left: 1px solid rgba(255, 255, 255, 0.1);
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <div class="status-card">
+        <div class="header">
+            <div class="brand">ZippyGo Live Track</div>
+            <div class="status-badge" id="status-badge">Locating...</div>
+        </div>
+
+        <div class="driver-panel" id="driver-panel">
+            <img class="driver-avatar" id="driver-avatar" src="" alt="Driver Avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            <div class="driver-info">
+                <div class="driver-name" id="driver-name">Assigning Captain...</div>
+                <div class="vehicle-info" id="vehicle-info">Waiting for driver assignment</div>
+            </div>
+        </div>
+
+        <div class="eta-panel" id="eta-panel" style="display: none; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; margin: 15px 0; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #94a3b8; font-weight: 500;">⚡ Live ETA</span>
+                <span id="last-updated" style="font-size: 11px; color: #64748b;">Just updated</span>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: baseline;">
+                <span id="eta-time" style="font-size: 22px; font-weight: 800; color: #10b981;">-- mins</span>
+                <span id="eta-distance" style="font-size: 14px; font-weight: 600; color: #38bdf8;">-- km remaining</span>
+            </div>
+        </div>
+
+        <div class="route-info">
+            <div class="address-row">
+                <span class="dot dot-pickup">🟢</span>
+                <div class="address-text">
+                    <strong style="display:block; font-size: 12px; color: #94a3b8;">PICKUP</strong>
+                    <span id="pickup-address">Loading pickup...</span>
+                </div>
+            </div>
+            <div class="address-row">
+                <span class="dot dot-drop">🔴</span>
+                <div class="address-text">
+                    <strong style="display:block; font-size: 12px; color: #94a3b8;">DESTINATION</strong>
+                    <span id="drop-address">Loading drop...</span>
+                </div>
+            </div>
+        </div>
+
+        <button id="copy-share-btn" style="width: 100%; padding: 10px; background-color: #22c55e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; font-size: 13px; transition: background 0.2s;">
+            🔗 Copy Share Link
+        </button>
+
+        <div class="privacy-alert">
+            🔒 Protected Live Link. Customer private contact information is masked.
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        const token = "<%= token %>";
+        let map, pickupMarker, dropMarker, driverMarker, routeLine, driverRouteLine;
+        let stopMarkers = [];
+        let hasRoute = false;
+        let lastUpdatedTime = null;
+
+        function updateETAPanel(duration, distance) {
+            const panel = document.getElementById('eta-panel');
+            const timeSpan = document.getElementById('eta-time');
+            const distSpan = document.getElementById('eta-distance');
+            const lastUpdatedSpan = document.getElementById('last-updated');
+
+            if (!panel || !timeSpan || !distSpan) return;
+
+            // Calculate duration in minutes (round up to nearest minute)
+            const minutes = Math.max(1, Math.round(duration / 60));
+            timeSpan.innerText = `${minutes} min${minutes > 1 ? 's' : ''}`;
+
+            // Calculate distance in kilometers
+            const km = (distance / 1000).toFixed(1);
+            distSpan.innerText = `${km} km remaining`;
+
+            panel.style.display = 'block';
+            lastUpdatedTime = Date.now();
+            if (lastUpdatedSpan) {
+                lastUpdatedSpan.innerText = 'Just updated';
+            }
+        }
+
+        function hideETAPanel() {
+            const panel = document.getElementById('eta-panel');
+            if (panel) {
+                panel.style.display = 'none';
+            }
+        }
+
+        // Custom assets for formal white mode look (preserving 117x186 aspect ratio)
+        const pickupIcon = L.icon({
+            iconUrl: '/images/pickup.png',
+            iconSize: [32, 51],
+            iconAnchor: [16, 51],
+            popupAnchor: [0, -48]
+        });
+
+        const dropIcon = L.icon({
+            iconUrl: '/images/drop.png',
+            iconSize: [32, 51],
+            iconAnchor: [16, 51],
+            popupAnchor: [0, -48]
+        });
+
+        const defaultDriverIcon = L.divIcon({
+            html: '<div style="font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));" class="driver-ping">🏍️</div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            className: ''
+        });
+
+        // Smooth linear interpolation animation for marker movement
+        function animateMarker(marker, startLatLng, endLatLng, duration = 1500) {
+            const start = performance.now();
+            
+            function step(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const lat = startLatLng.lat + (endLatLng.lat - startLatLng.lat) * progress;
+                const lng = startLatLng.lng + (endLatLng.lng - startLatLng.lng) * progress;
+                
+                marker.setLatLng([lat, lng]);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+
+        // Fetch driving route along roads using OSRM (supports multiple waypoints in sequence)
+        async function getRoadRoute(coordsList) {
+            try {
+                const pathStr = coordsList.map(c => `${c[1]},${c[0]}`).join(';');
+                const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${pathStr}?overview=full&geometries=geojson`);
+                const data = await response.json();
+                if (data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    return {
+                        coordinates: route.geometry.coordinates.map(coord => [coord[1], coord[0]]),
+                        distance: route.distance, // meters
+                        duration: route.duration  // seconds
+                    };
+                }
+            } catch (e) {
+                console.error("OSRM Routing API error:", e);
+            }
+            return null; // Fallback if API fails
+        }
+
+        function initMap(plat, plng, stopsList) {
+            map = L.map('map').setView([plat, plng], 15);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            pickupMarker = L.marker([plat, plng], { icon: pickupIcon }).addTo(map).bindPopup("Pickup Location");
+            
+            // Clear existing stop markers if any
+            stopMarkers.forEach(m => map.removeLayer(m));
+            stopMarkers = [];
+
+            // Draw intermediate stops and final destination
+            stopsList.forEach((stop, index) => {
+                const isFinal = (index === stopsList.length - 1);
+                if (isFinal) {
+                    dropMarker = L.marker(stop, { icon: dropIcon }).addTo(map).bindPopup("Destination");
+                } else {
+                    const stopIcon = L.divIcon({
+                        html: `<div style="background-color: #f59e0b; color: white; border: 2px solid white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11],
+                        className: ''
+                    });
+                    const marker = L.marker(stop, { icon: stopIcon }).addTo(map).bindPopup(`Stop ${index + 1}`);
+                    stopMarkers.push(marker);
+                }
+            });
+            
+            // Draw a straight line fallback initially passing through all stops
+            const lineCoords = [[plat, plng], ...stopsList];
+            routeLine = L.polyline(lineCoords, { color: '#475569', weight: 4, opacity: 0.6, dashArray: '5, 8' }).addTo(map);
+            
+            const bounds = L.latLngBounds(lineCoords);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function getRideStatusText(statusCode) {
+            switch (statusCode.toString()) {
+                case "0": return "Searching for Captain";
+                case "1": return "Captain Heading to Pickup";
+                case "2": return "Captain Arrived at Pickup";
+                case "3": return "Ride Confirmed";
+                case "4": return "Ride Cancelled";
+                case "5": return "Ride in Progress";
+                case "6": return "Ride Ended";
+                case "7": return "Waiting Payment";
+                case "8": return "Ride Completed";
+                default: return "On the Way";
+            }
+        }
+
+        function updateUI(data) {
+            const ride = data.ride;
+
+            const pickupCoords = ride.pic_lat_long.includes('&!') ? ride.pic_lat_long.split('&!') : ride.pic_lat_long.split(',');
+            const plat = parseFloat(pickupCoords[0]);
+            const plng = parseFloat(pickupCoords[1]);
+
+            // Parse drop coordinates which may contain multiple stops delimited by &!!
+            const dropCoordsParts = ride.drop_lat_long.split('&!!');
+            const stops = dropCoordsParts.map(part => {
+                const coords = part.includes('&!') ? part.split('&!') : part.split(',');
+                return [parseFloat(coords[0]), parseFloat(coords[1])];
+            });
+
+            // The last stop is the final destination
+            const finalStop = stops[stops.length - 1];
+            const dlat = finalStop[0];
+            const dlng = finalStop[1];
+
+            // Initialize map first on first successful response
+            if (!hasRoute && ride.pic_lat_long && ride.drop_lat_long) {
+                try {
+                    initMap(plat, plng, stops);
+                    hasRoute = true;
+                    
+                    // Fetch and draw the actual road route between pickup and all stops
+                    getRoadRoute([[plat, plng], ...stops]).then(result => {
+                        if (result && result.coordinates) {
+                            if (routeLine) map.removeLayer(routeLine);
+                            routeLine = L.polyline(result.coordinates, { color: '#475569', weight: 4, opacity: 0.6, dashArray: '5, 8' }).addTo(map);
+                        }
+                    });
+                } catch(e) {
+                    console.error("Map initialization failed:", e);
+                }
+            }
+            
+            // Update stop markers opacity based on drop_complete progress
+            const dropCompleteCount = parseInt(ride.drop_complete || "0");
+            stopMarkers.forEach((marker, index) => {
+                if (index < dropCompleteCount) {
+                    marker.setOpacity(0.35); // Completed stops look translucent
+                } else {
+                    marker.setOpacity(1.0);
+                }
+            });
+            if (dropMarker) {
+                const isFinalCompleted = (stops.length - 1) < dropCompleteCount;
+                if (isFinalCompleted) {
+                    dropMarker.setOpacity(0.35);
+                } else {
+                    dropMarker.setOpacity(1.0);
+                }
+            }
+
+            // Build route info dynamically to support multiple stops!
+            const routeInfoContainer = document.querySelector('.route-info');
+            if (routeInfoContainer) {
+                routeInfoContainer.innerHTML = ''; // Clear it
+
+                // Add Pickup
+                let cleanedPicAddress = (ride.pic_address || "Unavailable").replace(/&!$/, '');
+                const pickupHTML = `
+                    <div class="address-row">
+                        <span class="dot dot-pickup">🟢</span>
+                        <div class="address-text">
+                            <strong style="display:block; font-size: 11px; color: #94a3b8; letter-spacing: 0.5px;">PICKUP</strong>
+                            <span>${cleanedPicAddress}</span>
+                        </div>
+                    </div>
+                `;
+                routeInfoContainer.insertAdjacentHTML('beforeend', pickupHTML);
+
+                // Split drop address by &!!
+                const dropAddressParts = (ride.drop_address || "Unavailable").split('&!!');
+                
+                // Loop through drop addresses
+                dropAddressParts.forEach((addressPart, index) => {
+                    const isFinal = (index === dropAddressParts.length - 1);
+                    const isCompleted = index < dropCompleteCount;
+                    
+                    let cleanedAddress = addressPart.replace(/&!/g, ', ');
+                    if (cleanedAddress.endsWith(', ')) {
+                        cleanedAddress = cleanedAddress.slice(0, -2);
+                    }
+
+                    let dotEmoji = isCompleted ? '✅' : '🟡';
+                    let labelText = isFinal ? 'DESTINATION' : `STOP ${index + 1}`;
+                    if (isCompleted) {
+                        labelText += ' (COMPLETED)';
+                    }
+                    if (isFinal) {
+                        dotEmoji = isCompleted ? '✅' : '🔴';
+                    }
+
+                    const opacityStyle = isCompleted ? 'style="opacity: 0.55;"' : '';
+                    const textDecoration = isCompleted ? 'text-decoration: line-through; color: #64748b;' : '';
+
+                    const rowHTML = `
+                        <div class="address-row" ${opacityStyle}>
+                            <span class="dot" style="color: ${isCompleted ? '#22c55e' : (isFinal ? '#ef4444' : '#f59e0b')};">${dotEmoji}</span>
+                            <div class="address-text">
+                                <strong style="display:block; font-size: 11px; color: #94a3b8; letter-spacing: 0.5px;">${labelText}</strong>
+                                <span style="${textDecoration}">${cleanedAddress}</span>
+                            </div>
+                        </div>
+                    `;
+                    routeInfoContainer.insertAdjacentHTML('beforeend', rowHTML);
+                });
+            }
+            
+            // Update Status Badge
+            const statusBadge = document.getElementById('status-badge');
+            statusBadge.innerText = getRideStatusText(ride.status);
+            
+            if (ride.status == "5") {
+                statusBadge.style.backgroundColor = "#22c55e"; // Green for active ride
+            } else if (ride.status == "4") {
+                statusBadge.style.backgroundColor = "#ef4444"; // Red for cancelled
+            } else if (ride.status == "7") {
+                statusBadge.style.backgroundColor = "#f59e0b"; // Amber/Orange for waiting payment
+            } else if (ride.status == "8") {
+                statusBadge.style.backgroundColor = "#64748b"; // Slate for completed
+            } else {
+                statusBadge.style.backgroundColor = "#0ea5e9"; // Sky blue for heading/arrived
+            }
+
+            // Driver detail
+            if (ride.d_id && ride.first_name) {
+                document.getElementById('driver-name').innerText = ride.first_name + " " + (ride.last_name || "");
+                document.getElementById('vehicle-info').innerText = `${ride.car_color || ""} ${ride.car_name || "Vehicle"} • ${ride.vehicle_number || ""}`;
+                if (ride.profile_image) {
+                    document.getElementById('driver-avatar').src = "/" + ride.profile_image;
+                }
+                 // Update driver marker
+                if (ride.latitude && ride.longitude) {
+                    const drLat = parseFloat(ride.latitude);
+                    const drLng = parseFloat(ride.longitude);
+                    
+                    // Determine custom vehicle icon URL from database
+                    let vehicleIconUrl = '';
+                    if (ride.vehicle_map_image) {
+                        vehicleIconUrl = '/' + ride.vehicle_map_image;
+                    } else if (ride.vehicle_image) {
+                        vehicleIconUrl = '/' + ride.vehicle_image;
+                    }
+
+                    if (!driverMarker) {
+                        driverMarker = L.marker([drLat, drLng], { icon: defaultDriverIcon }).addTo(map).bindPopup("Captain's Location");
+                    } else {
+                        // Smoothly animate marker to new position
+                        animateMarker(driverMarker, driverMarker.getLatLng(), L.latLng(drLat, drLng), 1500);
+                    }
+
+                    if (vehicleIconUrl) {
+                        const img = new Image();
+                        img.src = vehicleIconUrl;
+                        img.onload = function() {
+                            const naturalWidth = img.naturalWidth || 100;
+                            const naturalHeight = img.naturalHeight || 100;
+                            const aspectRatio = naturalWidth / naturalHeight;
+                            
+                            // Scale proportionally (target height is 48px)
+                            const targetHeight = 48;
+                            const targetWidth = Math.round(targetHeight * aspectRatio);
+                            
+                            const customDriverIcon = L.icon({
+                                iconUrl: vehicleIconUrl,
+                                iconSize: [targetWidth, targetHeight],
+                                iconAnchor: [Math.round(targetWidth / 2), Math.round(targetHeight / 2)],
+                                popupAnchor: [0, -Math.round(targetHeight / 2)]
+                            });
+                            
+                            if (driverMarker) {
+                                driverMarker.setIcon(customDriverIcon);
+                            }
+                        };
+                    }
+                    
+                    // Pan map to driver if ride is in progress
+                    if (ride.status == "5") {
+                        map.panTo([drLat, drLng]);
+                    }
+
+                    // Draw driver's active path on roads (skipping already completed stops)
+                    let activeRouteCoords = [];
+                    let activeRouteColor = '#0ea5e9'; // vibrant sky blue
+                    
+                    if (ride.status == "1" || ride.status == "2" || ride.status == "3") {
+                        activeRouteCoords = [[drLat, drLng], [plat, plng]];
+                    } else if (ride.status == "5") {
+                        const remainingStops = stops.slice(dropCompleteCount);
+                        if (remainingStops.length > 0) {
+                            activeRouteCoords = [[drLat, drLng], ...remainingStops];
+                        }
+                        activeRouteColor = '#10b981'; // vibrant emerald green
+                    }
+
+                    if (activeRouteCoords.length >= 2) {
+                        getRoadRoute(activeRouteCoords).then(result => {
+                            if (result && result.coordinates) {
+                                if (driverRouteLine) map.removeLayer(driverRouteLine);
+                                driverRouteLine = L.polyline(result.coordinates, { color: activeRouteColor, weight: 6, opacity: 0.9 }).addTo(map);
+                                updateETAPanel(result.duration, result.distance);
+                            } else {
+                                hideETAPanel();
+                            }
+                        });
+                    } else {
+                        // Clear active path if no remaining stops
+                        if (driverRouteLine) {
+                            map.removeLayer(driverRouteLine);
+                            driverRouteLine = null;
+                        }
+                        hideETAPanel();
+                    }
+                }
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const response = await fetch(`/public/track/${token}/status`);
+                const data = await response.json();
+                if (data.Result === true) {
+                    updateUI(data);
+                    
+                    // If ride is finished or cancelled, stop polling
+                    if (data.ride.status == "4" || data.ride.status == "8") {
+                        console.log("Ride has completed/cancelled. Stopping track poll.");
+                        clearInterval(pollInterval);
+                    }
+                } else {
+                    window.location.reload(); // reload to trigger expired view
+                }
+            } catch(e) {
+                console.error("Failed to poll ride status:", e);
+            }
+        }
+
+        // Initial fetch
+        fetchStatus();
+        
+        // Poll status every 5 seconds
+        const pollInterval = setInterval(fetchStatus, 5000);
+
+        // Copy Share Link Button Handler
+        const copyBtn = document.getElementById('copy-share-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const shareUrl = window.location.href;
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    copyBtn.innerHTML = '✅ Link Copied!';
+                    copyBtn.style.backgroundColor = '#10b981';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '🔗 Copy Share Link';
+                        copyBtn.style.backgroundColor = '#22c55e';
+                    }, 2500);
+                }).catch(err => {
+                    console.error("Failed to copy link:", err);
+                });
+            });
+        }
+
+        // Auto-update "Last updated" relative time indicator every 5 seconds
+        setInterval(() => {
+            const lastUpdatedSpan = document.getElementById('last-updated');
+            if (lastUpdatedSpan && lastUpdatedTime) {
+                const diffMs = Date.now() - lastUpdatedTime;
+                const diffSec = Math.floor(diffMs / 1000);
+                if (diffSec < 10) {
+                    lastUpdatedSpan.innerText = 'Just updated';
+                } else if (diffSec < 60) {
+                    lastUpdatedSpan.innerText = `Updated ${diffSec}s ago`;
+                } else {
+                    const diffMin = Math.floor(diffSec / 60);
+                    lastUpdatedSpan.innerText = `Updated ${diffMin}m ago`;
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

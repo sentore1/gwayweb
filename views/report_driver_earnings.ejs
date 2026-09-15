@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+    
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3>Driver Earnings Report</h3>
+                </div>
+                <div class="col-sm-6">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item">Dashboard</li>
+                    <li class="breadcrumb-item active">Driver Earnings Report</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header col-12 pb-0">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label"><%=lan.start%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreports" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label"><%=lan.end%> <%=lan.date%></label>
+                                    <input class="form-control" id="payreporte" type="date" value="">
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label">Driver</label>
+                                    <select class="js-example-basic-single" id="report_driver_id" style="width: 100%;">
+                                        <option value="0" selected>All Drivers</option>
+                                        <% drivers.forEach((val) => { %>
+                                            <option value="<%= val.id %>"><%= val.first_name %> <%= val.last_name %> (<%= val.primary_ccode %> <%= val.primary_phoneNo %>)</option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 form-group mb-3">
+                                    <label class="col-label">Zone</label>
+                                    <select class="js-example-basic-single" id="report_zone_id" style="width: 100%;">
+                                        <option value="0" selected>All Zones</option>
+                                        <% zones.forEach((val) => { %>
+                                            <option value="<%= val.id %>"><%= val.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Driver Name</th>
+                                            <th>Trips</th>
+                                            <th>Total Revenue</th>
+                                            <th>Cash Collected</th>
+                                            <th>Online Payments</th>
+                                            <th>Platform Commission</th>
+                                            <th>Net Earnings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="driver_earnings_report">
+                                        <% let i = 1 %>
+                                        <% data.forEach((val) => { %>
+                                            <tr>
+                                                <td><%= i %></td>
+                                                <td><%= val.first_name %> <%= val.last_name %> (<%= val.primary_ccode %> <%= val.primary_phoneNo %>)</td>
+                                                <td><%= val.trips %></td>
+                                                <td class="invosymbol"><%= Number(val.total_revenue).toFixed(2) %></td>
+                                                <td class="invosymbol"><%= Number(val.cash_collected).toFixed(2) %></td>
+                                                <td class="invosymbol"><%= Number(val.online_payments).toFixed(2) %></td>
+                                                <td class="invosymbol"><%= Number(val.commission).toFixed(2) %></td>
+                                                <td class="invosymbol"><%= (Number(val.total_revenue) - Number(val.commission)).toFixed(2) %></td>
+                                            </tr>
+                                        <% i++ %>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 text-end form-group">
+                                <button class="btn btn-square btn-primary b-r-10" id="down_driver_earnings_report" style="margin-top: 30px;" type="button">Download Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+  </body>
+</html>

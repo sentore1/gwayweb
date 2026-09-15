@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head'); -%>
+    <style>
+        .glowing-alert {
+            animation: glow 1.5s infinite alternate;
+        }
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px #ff3b30, inset 0 0 5px #ff3b30;
+                background-color: rgba(255, 59, 48, 0.05);
+            }
+            to {
+                box-shadow: 0 0 15px #ff3b30, inset 0 0 10px #ff3b30;
+                background-color: rgba(255, 59, 48, 0.15);
+            }
+        }
+    </style>
+</head>
+<body onload="startTime()">
+    <%- include('./partials/header_sidebar'); -%>
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>🚨 Active SOS Emergency Alerts</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/index"><i data-feather="home"></i></a></li>
+                            <li class="breadcrumb-item"><%=lan.dashboard%></li>
+                            <li class="breadcrumb-item active">SOS Alerts</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <!-- Active Alerts Section -->
+                <div class="col-sm-12">
+                    <div class="card border-danger">
+                        <div class="card-header py-3 bg-light-danger border-bottom border-danger">
+                            <h5 class="text-danger">🔴 Live Active Alerts</h5>
+                            <span class="text-danger-custom">Real-time emergency signals received from customers and drivers. Handle immediately!</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-1">
+                                    <thead>
+                                        <tr>
+                                            <th>Alert ID</th>
+                                            <th>Ride ID</th>
+                                            <th>Reporter</th>
+                                            <th>Details</th>
+                                            <th>Last Known Location</th>
+                                            <th>Tracking Link</th>
+                                            <th>Triggered Time</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="active_alerts_tbody">
+                                        <% if (activeAlerts.length === 0) { %>
+                                            <tr id="no_active_row">
+                                                <td colspan="8" class="text-center text-muted py-4">No active emergency alerts. All quiet!</td>
+                                            </tr>
+                                        <% } else { %>
+                                            <% activeAlerts.forEach((alert) => { %>
+                                                <tr class="glowing-alert" id="alert_row_<%= alert.id %>">
+                                                    <td><strong>#<%= alert.id %></strong></td>
+                                                    <td><a href="/rides/ride_details/<%= alert.ride_id %>">#<%= alert.ride_id %></a></td>
+                                                    <td>
+                                                        <span class="badge rounded-pill <%= alert.reporter_type === 'customer' ? 'badge-light-primary text-primary' : 'badge-light-warning text-dark' %>">
+                                                            <%= alert.reporter_type.toUpperCase() %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>Customer:</strong> <%= alert.customer_name %> (<%= alert.customer_phone %>)<br>
+                                                        <strong>Driver:</strong> <%= alert.driver_first_name ? alert.driver_first_name + ' ' + alert.driver_last_name : 'Not Assigned' %> (<%= alert.driver_phone || 'N/A' %>)
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://www.google.com/maps/search/?api=1&query=<%= alert.latitude %>,<%= alert.longitude %>" target="_blank" class="btn btn-xs btn-outline-danger b-r-5">
+                                                            <i class="fa fa-map-marker"></i> View Location
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="/public/track/<%= alert.tracking_token %>" target="_blank" class="btn btn-xs btn-outline-primary b-r-5">
+                                                            <i class="fa fa-eye"></i> Track Live
+                                                        </a>
+                                                    </td>
+                                                    <td><%= new Date(alert.created_at).toLocaleString() %></td>
+                                                    <td>
+                                                        <button class="btn btn-square btn-danger btn-xs b-r-5 resolve-btn" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#resolve_modal"
+                                                                data-id="<%= alert.id %>"
+                                                                data-ride="<%= alert.ride_id %>"
+                                                                data-reporter="<%= alert.reporter_type %>">
+                                                            Resolve
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolved History Section -->
+                <div class="col-sm-12 mt-4">
+                    <div class="card">
+                        <div class="card-header py-3 border-bottom">
+                            <h5>📜 Resolved SOS History</h5>
+                            <span class="text-muted">Log record of resolved emergency cases and audit actions.</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive theme-scrollbar">
+                                <table class="display" id="basic-2">
+                                    <thead>
+                                        <tr>
+                                            <th>Alert ID</th>
+                                            <th>Ride ID</th>
+                                            <th>Reporter</th>
+                                            <th>Location</th>
+                                            <th>Triggered At</th>
+                                            <th>Resolved At</th>
+                                            <th>Resolution Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (resolvedAlerts.length === 0) { %>
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-3">No resolved history records.</td>
+                                            </tr>
+                                        <% } else { %>
+                                            <% resolvedAlerts.forEach((alert) => { %>
+                                                <tr>
+                                                    <td>#<%= alert.id %></td>
+                                                    <td>#<%= alert.ride_id %></td>
+                                                    <td>
+                                                        <span class="badge rounded-pill badge-light-secondary text-secondary">
+                                                            <%= alert.reporter_type.toUpperCase() %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://www.google.com/maps/search/?api=1&query=<%= alert.latitude %>,<%= alert.longitude %>" target="_blank" class="text-muted">
+                                                            <%= alert.latitude %>, <%= alert.longitude %>
+                                                        </a>
+                                                    </td>
+                                                    <td><%= new Date(alert.created_at).toLocaleString() %></td>
+                                                    <td><%= new Date(alert.resolved_at).toLocaleString() %></td>
+                                                    <td>
+                                                        <span class="text-muted"><%= alert.resolution_notes || 'No notes left.' %></span>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolve Modal -->
+    <div class="modal fade" id="resolve_modal" tabindex="-1" role="dialog" aria-labelledby="resolve_modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Resolve SOS Emergency Alert</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/settings/sos_resolve_admin" method="post" id="resolve_form">
+                    <div class="modal-body">
+                        <input type="hidden" id="resolve_alert_id" name="id">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <p>You are marking SOS Alert <strong id="modal_alert_id_label"></strong> for Ride <strong id="modal_ride_id_label"></strong> as resolved. Please provide action/audit notes below.</p>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Audit / Resolution Notes</label>
+                                <textarea class="form-control" rows="4" name="resolution_notes" placeholder="Describe safety check actions taken, communication details, resolution, etc." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-danger" type="submit">Resolve Alert</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer'); -%>
+    <%- include('./partials/script'); -%>
+
+    <!-- Audio Alert Element -->
+    <audio id="sos_alarm_sound" src="/uploads/settings/1727699748459apple_pay.mp3" preload="auto" loop></audio>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Setup datatable if loaded (polling for async load)
+            var checkDtInterval = setInterval(function() {
+                if (typeof $ !== 'undefined' && $.fn.DataTable) {
+                    clearInterval(checkDtInterval);
+                    $('#basic-2').DataTable({
+                        order: [[0, 'desc']]
+                    });
+                }
+            }, 100);
+
+            // Handle Resolve Button click (Vanilla JS event delegation)
+            document.addEventListener("click", function(event) {
+                const btn = event.target.closest(".resolve-btn");
+                if (btn) {
+                    const id = btn.getAttribute("data-id");
+                    const rideId = btn.getAttribute("data-ride");
+                    
+                    const hiddenInput = document.getElementById("resolve_alert_id");
+                    const labelId = document.getElementById("modal_alert_id_label");
+                    const labelRide = document.getElementById("modal_ride_id_label");
+                    
+                    if (hiddenInput) hiddenInput.value = id;
+                    if (labelId) labelId.textContent = "#" + id;
+                    if (labelRide) labelRide.textContent = "#" + rideId;
+                }
+            });
+
+            // Listen to real-time Socket.IO SOS events
+            if (typeof socket !== 'undefined') {
+                socket.on("sos_alert", function(data) {
+                    console.log("Real-time SOS alert received:", data);
+                    
+                    // Play Alarm Sound
+                    const alarm = document.getElementById("sos_alarm_sound");
+                    if (alarm) {
+                        alarm.play().catch(e => console.log("Audio play deferred until interaction"));
+                    }
+
+                    // Show browser desktop notification or alert box
+                    toastr.error('🚨 EMERGENCY: SOS Alert triggered for Ride #' + data.ride_id + '!', 'CRITICAL ALERT', {
+                        timeOut: 0,
+                        extendedTimeOut: 0,
+                        closeButton: true
+                    });
+
+                    // Add dynamic glowing row to active table
+                    $("#no_active_row").remove();
+                    const customerName = data.ride_details ? data.ride_details.customer_name || 'Customer' : 'Customer';
+                    const customerPhone = data.ride_details ? data.ride_details.customer_phone || '' : '';
+                    const driverName = data.ride_details ? (data.ride_details.driver_first_name ? data.ride_details.driver_first_name + ' ' + data.ride_details.driver_last_name : 'Not Assigned') : 'Not Assigned';
+                    const driverPhone = data.ride_details ? data.ride_details.driver_phone || 'N/A' : 'N/A';
+
+                    const newRow = `
+                        <tr class="glowing-alert" id="alert_row_${data.id}">
+                            <td><strong>#${data.id}</strong></td>
+                            <td><a href="/rides/ride_details/${data.ride_id}">#${data.ride_id}</a></td>
+                            <td>
+                                <span class="badge rounded-pill ${data.reporter_type === 'customer' ? 'badge-light-primary text-primary' : 'badge-light-warning text-dark'}">
+                                    ${data.reporter_type.toUpperCase()}
+                                </span>
+                            </td>
+                            <td>
+                                <strong>Customer:</strong> ${customerName} (${customerPhone})<br>
+                                <strong>Driver:</strong> ${driverName} (${driverPhone})
+                            </td>
+                            <td>
+                                <a href="https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}" target="_blank" class="btn btn-xs btn-outline-danger b-r-5">
+                                    <i class="fa fa-map-marker"></i> View Location
+                                </a>
+                            </td>
+                            <td>
+                                <a href="/public/track/${data.tracking_token}" target="_blank" class="btn btn-xs btn-outline-primary b-r-5">
+                                    <i class="fa fa-eye"></i> Track Live
+                                </a>
+                            </td>
+                            <td>${new Date(data.created_at).toLocaleString()}</td>
+                            <td>
+                                <button class="btn btn-square btn-danger btn-xs b-r-5 resolve-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#resolve_modal"
+                                        data-id="${data.id}"
+                                        data-ride="${data.ride_id}"
+                                        data-reporter="${data.reporter_type}">
+                                    Resolve
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+
+                    $("#active_alerts_tbody").prepend(newRow);
+                });
+
+                socket.on("sos_alert_resolved", function(data) {
+                    // Remove row and reload to update history
+                    $(`#alert_row_${data.id}`).fadeOut(1000, function() {
+                        $(this).remove();
+                        // Stop alarm if no active alerts left
+                        if ($("#active_alerts_tbody tr").length === 0) {
+                            const alarm = document.getElementById("sos_alarm_sound");
+                            if (alarm) {
+                                alarm.pause();
+                                alarm.currentTime = 0;
+                            }
+                        }
+                        location.reload();
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
