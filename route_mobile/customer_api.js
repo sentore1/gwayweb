@@ -218,8 +218,7 @@ router.post("/edit_customer", customer_profile.single("profile_img"), async (req
             req.hostname,
             req.protocol
         ) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         const customer_data = await DataFind(`SELECT * FROM tbl_customer WHERE id = '${id}'`);
@@ -2982,8 +2981,7 @@ router.post("/account_deactive", async(req, res)=>{
 
         if (await DataUpdate(`tbl_customer`, `status = '0'`, `id = '${id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         return res.status(200).json({ ResponseCode: 200, Result:true, message: "Account Deactivate Successful" });

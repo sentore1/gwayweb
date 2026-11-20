@@ -65,8 +65,7 @@ router.post("/add_role", auth, async(req, res)=>{
 
         if (await DataInsert(`tbl_admin`, `name, email, country_code, phone, password, role`, `'${name}', '${email}', '${country_code}', '${phone}', '${phash}', '2'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         if (await DataInsert(`tbl_role_permission`,
@@ -105,8 +104,7 @@ router.post("/add_role", auth, async(req, res)=>{
             '${sosview == "on" ? "1" : "0"},${sosedit == "on" ? "1" : "0"}',
             '${callview == "on" ? "1" : "0"},${calledit == "on" ? "1" : "0"}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Role Add successfully');
@@ -186,8 +184,7 @@ router.post("/edit_role/:id", auth, async(req, res)=>{
             if (await DataUpdate(`tbl_admin`, `name = '${name}', email = '${email}', country_code = '${country_code}', phone = '${phone}', password = '${hase}'`,
                 `country_code = '${role_data[0].country_code}' AND phone = '${role_data[0].phone}'`, req.hostname, req.protocol) == -1) {
             
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             if (await DataUpdate(`tbl_role_permission`, `name='${name}', email='${email}', country_code='${country_code}', phone='${phone}', status='${status}',
@@ -222,8 +219,7 @@ router.post("/edit_role/:id", auth, async(req, res)=>{
                 call_masking = '${callview == "on" ? "1" : "0"},${calledit == "on" ? "1" : "0"}'`,
                 `id = '${role_data[0].id}'`, req.hostname, req.protocol) == -1) {
                     
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
     
             req.flash('success', 'Role Updated successfully');
@@ -247,14 +243,12 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_role_permission`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
 
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         if (await DataDelete(`tbl_admin`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Role Deleted successfully');

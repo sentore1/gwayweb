@@ -835,6 +835,234 @@ router.post("/webhook/:gateway", async(req, res)=>{
     }
 });
 
+// ============= MTN MoMo Rwanda Payment ================ //
+// Flow: Flutter opens /payment/momo-payment (WebView) → user enters phone →
+//       server calls MTN requestToPay → polls status → redirects to status_page
+
+router.get("/momo-payment", async (req, res) => {
+    try {
+        const { amount, uid, redirect_url } = req.query;
+        if (!amount || !uid) return res.status(200).json({ message: 'Data Not Found!', status: false });
+
+        const payment_detail = await DataFind(`SELECT * FROM tbl_payment_detail WHERE id = '12'`);
+        if (payment_detail == "") return res.status(200).json({ message: 'Something Went Wrong!', status: false });
+
+        let pkey = payment_detail[0].attribute.split(",");
+        // pkey[0] = API User (UUID), pkey[1] = API Key, pkey[2] = Subscription Key, pkey[3] = environment (sandbox|production)
+        if (!pkey[0] || !pkey[1] || !pkey[2]) return res.status(200).json({ message: 'MoMo not configured!', status: false });
+
+        const admin_data = await DataFind(`SELECT * FROM tbl_customer WHERE id = '${uid}'`);
+        if (admin_data == "") return res.status(200).json({ message: 'Something Went Wrong!', status: false });
+
+        const general_setting = await DataFind(`SELECT * FROM tbl_general_settings`);
+        const appTitle = (general_setting.length > 0 && general_setting[0].title) ? general_setting[0].title : 'ZippyGo';
+
+        // Render the phone-entry page
+        res.render("momo_payment", {
+            uid,
+            amount,
+            redirect_url: redirect_url || '',
+            appTitle,
+            general: general_setting.length > 0 ? general_setting[0] : {}
+        });
+
+    } catch (error) {
+        console.error("MoMo payment error:", error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Called by the momo_payment view form submission
+router.post("/momo-initiate", async (req, res) => {
+    try {
+        const { amount, uid, phone, redirect_url } = req.body;
+        if (!amount || !uid || !phone) {
+            return res.status(200).json({ message: 'Missing required fields!', status: false });
+        }
+
+        const payment_detail = await DataFind(`SELECT * FROM tbl_payment_detail WHERE id = '12'`);
+        if (payment_detail == "") return res.status(200).json({ message: 'Something Went Wrong!', status: false });
+
+        let pkey = payment_detail[0].attribute.split(",");
+        const apiUser        = pkey[0].trim();
+        const apiKey         = pkey[1].trim();
+        const subscriptionKey = pkey[2].trim();
+        const environment    = (pkey[3] || 'sandbox').trim();
+
+        const isSandbox = environment === 'sandbox';
+        const baseUrl   = isSandbox
+            ? 'https://sandbox.momoapi.mtn.com'
+            : 'https://proxy.momoapi.mtn.com';
+
+        // 1. Get OAuth token
+        const tokenRes = await axios.post(
+            `${baseUrl}/collection/token/`,
+            {},
+            {
+                auth: { username: apiUser, password: apiKey },
+                headers: {
+                    'Ocp-Apim-Subscription-Key': subscriptionKey,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        const accessToken = tokenRes.data.access_token;
+
+        // 2. Build requestToPay payload
+        const referenceId = crypto.randomUUID ? crypto.randomUUID() : require('crypto').randomUUID();
+        const momoRef = `MOMO-${referenceId}`;
+
+        // Normalize phone: strip leading + or 0, ensure 250XXXXXXXXX format for Rwanda
+        let normalizedPhone = phone.replace(/\s+/g, '').replace(/^\+/, '');
+        if (normalizedPhone.startsWith('0')) {
+            normalizedPhone = '250' + normalizedPhone.slice(1);
+        }
+        if (!normalizedPhone.startsWith('250')) {
+            normalizedPhone = '250' + normalizedPhone;
+        }
+
+        const general_setting2 = await DataFind(`SELECT * FROM tbl_general_settings`);
+        const appTitle = (general_setting2.length > 0 && general_setting2[0].title) ? general_setting2[0].title : 'ZippyGo';
+
+        const payload = {
+            amount: parseFloat(amount).toFixed(2),
+            currency: isSandbox ? 'EUR' : 'RWF',
+            externalId: momoRef,
+            payer: {
+                partyIdType: 'MSISDN',
+                partyId: normalizedPhone
+            },
+            payerMessage: `${appTitle} Wallet Top-up`,
+            payeeNote:    `Wallet credit for user ${uid}`
+        };
+
+        // 3. Send requestToPay
+        await axios.post(
+            `${baseUrl}/collection/v1_0/requesttopay`,
+            payload,
+            {
+                headers: {
+                    'Authorization':             `Bearer ${accessToken}`,
+                    'X-Reference-Id':            referenceId,
+                    'X-Target-Environment':      environment,
+                    'Ocp-Apim-Subscription-Key': subscriptionKey,
+                    'Content-Type':              'application/json'
+                }
+            }
+        );
+
+        // 4. Create pending transaction (store referenceId as provider_reference)
+        await createPendingTransaction('12', uid, amount, referenceId);
+
+        // 5. Redirect to polling page
+        return res.redirect(
+            `/payment/momo-status?referenceId=${referenceId}&uid=${uid}&amount=${amount}` +
+            `&redirect_url=${encodeURIComponent(redirect_url || '')}&baseUrl=${encodeURIComponent(baseUrl)}` +
+            `&subscriptionKey=${encodeURIComponent(subscriptionKey)}&apiUser=${encodeURIComponent(apiUser)}` +
+            `&apiKey=${encodeURIComponent(apiKey)}&environment=${encodeURIComponent(environment)}`
+        );
+
+    } catch (error) {
+        const { amount, uid, redirect_url } = req.body;
+        console.error("MoMo initiate error:", error.response ? error.response.data : error.message);
+        return res.redirect(`/payment/status_page?status=fail&amount=${amount || 0}&redirect_url=${encodeURIComponent(redirect_url || '')}`);
+    }
+});
+
+// Polling page — server polls MTN every 5 s (up to 12 times = 60 s), then redirects
+router.get("/momo-status", async (req, res) => {
+    try {
+        const { referenceId, uid, amount, redirect_url, baseUrl, subscriptionKey, apiUser, apiKey, environment } = req.query;
+
+        const general_setting = await DataFind(`SELECT * FROM tbl_general_settings`);
+
+        res.render("momo_status", {
+            referenceId,
+            uid,
+            amount,
+            redirect_url: redirect_url || '',
+            baseUrl,
+            subscriptionKey,
+            apiUser,
+            apiKey,
+            environment,
+            general: general_setting.length > 0 ? general_setting[0] : {}
+        });
+    } catch (error) {
+        console.error("MoMo status page error:", error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// AJAX endpoint called by momo_status view to check transaction status
+router.get("/momo-check", async (req, res) => {
+    try {
+        const { referenceId, uid, amount, redirect_url } = req.query;
+
+        const payment_detail = await DataFind(`SELECT * FROM tbl_payment_detail WHERE id = '12'`);
+        if (payment_detail == "") return res.status(200).json({ status: 'ERROR', message: 'Config not found' });
+
+        let pkey = payment_detail[0].attribute.split(",");
+        const apiUser         = pkey[0].trim();
+        const apiKey          = pkey[1].trim();
+        const subscriptionKey = pkey[2].trim();
+        const environment     = (pkey[3] || 'sandbox').trim();
+
+        const isSandbox = environment === 'sandbox';
+        const baseUrl   = isSandbox
+            ? 'https://sandbox.momoapi.mtn.com'
+            : 'https://proxy.momoapi.mtn.com';
+
+        // Get fresh token
+        const tokenRes = await axios.post(
+            `${baseUrl}/collection/token/`,
+            {},
+            {
+                auth: { username: apiUser, password: apiKey },
+                headers: { 'Ocp-Apim-Subscription-Key': subscriptionKey }
+            }
+        );
+        const accessToken = tokenRes.data.access_token;
+
+        // Check requestToPay status
+        const statusRes = await axios.get(
+            `${baseUrl}/collection/v1_0/requesttopay/${referenceId}`,
+            {
+                headers: {
+                    'Authorization':             `Bearer ${accessToken}`,
+                    'X-Target-Environment':      environment,
+                    'Ocp-Apim-Subscription-Key': subscriptionKey
+                }
+            }
+        );
+
+        const momoStatus = statusRes.data.financialTransactionId
+            ? statusRes.data.status
+            : statusRes.data.status;
+
+        if (momoStatus === 'SUCCESSFUL') {
+            await creditUserWallet(uid, '12', amount, referenceId, req);
+            return res.json({
+                status: 'SUCCESSFUL',
+                redirect: `/payment/status_page?status=success&transactionId=${referenceId}&amount=${amount}&redirect_url=${encodeURIComponent(redirect_url || '')}`
+            });
+        } else if (momoStatus === 'FAILED' || momoStatus === 'REJECTED') {
+            await DataUpdate(`tbl_payment_transaction`, `status = 'failed'`, `provider_reference = '${referenceId}'`, req.hostname, req.protocol);
+            return res.json({
+                status: momoStatus,
+                redirect: `/payment/status_page?status=fail&transactionId=${referenceId}&amount=${amount}&redirect_url=${encodeURIComponent(redirect_url || '')}`
+            });
+        } else {
+            // PENDING — still waiting
+            return res.json({ status: momoStatus || 'PENDING' });
+        }
+
+    } catch (error) {
+        console.error("MoMo check error:", error.response ? error.response.data : error.message);
+        return res.json({ status: 'ERROR', message: 'Could not reach MoMo API' });
+    }
+});
+
 // ============= Status Page ================ //
 
 router.get("/status_page", async(req, res)=>{

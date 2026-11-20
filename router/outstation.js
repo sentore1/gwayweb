@@ -88,8 +88,7 @@ router.post("/add_categorydata", auth, upload.single('image'), async(req, res)=>
             `image, title, description`,
             `'${imageUrl}', ${estitle}, ${esdes}`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Category Add successfully');
@@ -133,8 +132,7 @@ router.post("/edit_categorydata/:id", auth, upload.single('image'), async(req, r
         if (await DataUpdate(`tbl_outstation_category`, `image = '${imageUrl}', title = ${estitle}, description = ${esdes}`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Category Updated successfully');
@@ -153,8 +151,7 @@ router.get("/delete_category/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_outstation_category`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Category Deleted successfully');
@@ -217,8 +214,7 @@ router.post("/add_outstation", auth, oustation.single('image'), async(req, res)=
             '${outstation_category}', '${offer}', '${minfare}', '${maxifare}'`
             , req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Outstation Add successfully');
@@ -299,8 +295,7 @@ router.post("/edit_outstation/:id", auth, oustation.single('image'), async(req, 
             day_after_price = '${day_after_price}', outstation_category = '${outstation_category}', bidding = '${offer}', minimum_fare = '${minfare}', maximum_fare = '${maxifare}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Outstation Updated successfully');
@@ -318,8 +313,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_outstation`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Outstation Deleted successfully');
@@ -366,8 +360,7 @@ router.post("/edit_outstation_setting", auth, msetting.single('image'), async(re
         if (await DataUpdate(`tbl_module_setting`, `image = '${imageUrl}', name = ${estitle}, description = ${descri}`,
             `id = '1'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         // const imageUrl = req.file ? "uploads/module_setting/" + req.file.filename : null;

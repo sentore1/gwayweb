@@ -174,8 +174,7 @@ router.post("/add_setting", auth, upload.fields([{name: 'dark_image', maxCount: 
                 '${immediate_request_expire_minutes || 10}', '${scheduled_request_expire_minutes || 15}'`, 
                 req.hostname, req.protocol) == -1) {
                 
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             
@@ -208,8 +207,7 @@ router.post("/add_setting", auth, upload.fields([{name: 'dark_image', maxCount: 
                 
                 `id = '${general_setting[0].id}'`, req.hostname, req.protocol) == -1) {
         
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
         }
 
@@ -278,8 +276,7 @@ router.post("/edit_payment_data/:id", auth, paymentimg.fields([{name: 'image', m
             `image = '${imageUrl}', name = '${name}', sub_title = '${sub_title}', attribute = '${attrib}', status = '${status}', wallet_status = '${wstatus_no}', auto_approved = '${auto_approved_val}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Payment Data Updated successfully');
@@ -320,8 +317,7 @@ router.post("/add_ride_c_reason", auth, async(req, res)=>{
 
         if (await DataInsert(`tbl_ride_cancel_reason`, `title, status`, `${estitle}, '${statuss}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Ride Cancel Reason Add successfully');
@@ -344,8 +340,7 @@ router.post("/edit_ride_c_reason/:id", auth, async(req, res)=>{
 
         if (await DataUpdate(`tbl_ride_cancel_reason`, `title = ${estitle}, status = ${statuss}`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Ride Cancel Reason Updated successfully');
@@ -364,8 +359,7 @@ router.get("/ride_c_reason_delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_ride_cancel_reason`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Ride Cancel Reason Deleted successfully');
@@ -407,8 +401,7 @@ router.post("/add_review_reason", auth, async(req, res)=>{
 
         if (await DataInsert(`tbl_ride_review_reason`, `title, status`, `${estitle}, '${statuss}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Ride Review Add successfully');
@@ -431,8 +424,7 @@ router.post("/edit_review_reason/:id", auth, async(req, res)=>{
 
         if (await DataUpdate(`tbl_ride_review_reason`, `title = ${estitle}, status = ${statuss}`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Ride Review Updated successfully');
@@ -451,8 +443,7 @@ router.get("/review_reason_delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_ride_review_reason`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Ride Review Deleted successfully');
@@ -520,8 +511,7 @@ router.post("/add_wpayment", auth, payout.single('image'), async(req, res)=>{
         if (status == "2") {
             const rej_reason = rejection_reason || '';
             if (await DataUpdate(`tbl_wallet_withdraw`, `status = '2', rejection_reason = '${rej_reason}'`, `id = '${payment_sid}'`, req.hostname, req.protocol) == -1) {
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             const driver = await DataFind(`SELECT payout_wallet, tot_payout FROM tbl_driver WHERE id = '${driverId}'`);
@@ -540,8 +530,7 @@ router.post("/add_wpayment", auth, payout.single('image'), async(req, res)=>{
             req.flash('success', 'Payout request rejected and driver refunded.');
         } else {
             if (await DataUpdate(`tbl_wallet_withdraw`, `image = '${imageUrl}', justification_note = '${justification_note || ''}', status = '1'`, `id = '${payment_sid}'`, req.hostname, req.protocol) == -1) {
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             await DataUpdate(`tbl_transaction_driver`, `status = '1'`, `type = '${payment_sid}'`, req.hostname, req.protocol);
@@ -686,8 +675,7 @@ router.post("/accept_driver_cash", auth, async(req, res)=>{
             }
     
             if (await DataUpdate(`tbl_cash_adjust`, `status = '1'`, `id = '${id}'`, req.hostname, req.protocol) == -1) {
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             sendTemplatedNotification('cash_transfer_approved', 'driver', cash_list[0].driver_id, {
@@ -721,8 +709,7 @@ router.post("/reject_driver_cash", auth, async(req, res)=>{
 
         const rej_reason = rejection_reason || '';
         if (await DataUpdate(`tbl_cash_adjust`, `status = '2', rejection_reason = '${rej_reason}'`, `id = '${id}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         if (cash_list.length > 0) {
@@ -766,8 +753,7 @@ router.post("/add_faq", auth, async(req, res)=>{
 
         let estitle = mysql.escape(title), esdec = mysql.escape(description), statuss = status == "on" ? 1 : 0;
         if (await DataInsert(`tbl_list_faq`, `title, description, status`, `${estitle}, ${esdec}, '${statuss}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'FAQ Add successfully');
@@ -788,8 +774,7 @@ router.post("/edit_faq/:id", auth, async(req, res)=>{
         let estitle = mysql.escape(title), esdec = mysql.escape(description), statuss = status == "on" ? 1 : 0;
 
         if (await DataUpdate(`tbl_list_faq`, `title = ${estitle}, description = ${esdec}, status = '${statuss}'`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'FAQ Updated successfully');
@@ -807,8 +792,7 @@ router.get("/delete_faq/:id", auth, async(req, res)=>{
     return res.redirect("back");
 }
         if (await DataDelete(`tbl_list_faq`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'FAQ Deleted successfully');
@@ -863,8 +847,7 @@ router.post("/edit_pages_data/:id", auth, async(req, res)=>{
         // }
 
         if (await DataUpdate(`tbl_list_pages`, `title = ${estitle}, description = ${esdec}, status = '${status}'`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Pages Updated successfully');
@@ -967,8 +950,7 @@ router.post("/send_save_notification", auth, push_notification.single('image'), 
         if (await DataInsert(`tbl_send_notification`, `image, title, description, customer, driver, count, date, status`,
             `'${imageUrl}', ${title ? esname : ''}, ${description ? esdec : ''}, '${cid}', '${d_id}', '1', '${date}', '1'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Notification Send successfully');
@@ -1046,8 +1028,7 @@ router.get("/noti_resend/:id", auth, async(req, res)=>{
             let count = parseFloat(ndata[0].count) + parseFloat(1);
 
             if (await DataUpdate(`tbl_send_notification`, `count = '${count}'`, `id = '${ndata[0].id}'`, req.hostname, req.protocol) == -1) {
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             const general_setting = await DataFind(`SELECT title FROM tbl_general_settings`)
@@ -1165,8 +1146,7 @@ router.post("/editsend/:id", auth, push_notification.single('image'), async(req,
                 `image = '${imageUrl}', title = ${esname}, description = ${esdec}, customer = '${cid}', driver = '${d_id}', count = '${count}', status = '${nstatus}'`,
                 `id = '${ndata[0].id}'`, req.hostname, req.protocol) == -1) {
             
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
     
             req.flash('success', 'Notification Updated successfully');
@@ -1185,8 +1165,7 @@ router.get("/noti_delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_send_notification`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Notification Deleted successfully');

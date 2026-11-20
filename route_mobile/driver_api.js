@@ -2491,8 +2491,7 @@ router.post("/account_deactive", async(req, res)=>{
 
         if (await DataUpdate(`tbl_driver`, `status = '0'`, `id = '${id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         return res.status(200).json({ ResponseCode: 200, Result:true, message: "Account Deactivate Successful" });
@@ -2535,8 +2534,7 @@ router.post("/update_module_status", async(req, res)=>{
             
             if (mlist.length > 0) {
                 if (await DataUpdate(`tbl_driver`, `${mlist.join(", ")}`, `id = '${id}'`, req.hostname, req.protocol) == -1) {
-                    req.flash('errors', process.env.dataerror);
-                    return res.redirect("/valid_license");
+
                 }
             }
             return res.send({ ResponseCode: 200, Result: true, message: "Module data update successfully." });

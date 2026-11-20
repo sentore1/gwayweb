@@ -43,8 +43,7 @@ router.post("/add_coupon", auth, async(req, res)=>{
         if (await DataInsert(`tbl_coupon`, `title, sub_title, code, start_date, end_date, min_amount, discount_amount`,
             `'${title}', '${finalSubtitle}', '${code}', '${start_date}', '${end_date}', '${min_amount}', '${discount_amount}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Coupon Add successfully');
@@ -72,8 +71,7 @@ router.post("/edit_coupon/:id", auth, async(req, res)=>{
             discount_amount = '${discount_amount}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Coupon Updated successfully');
@@ -92,8 +90,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_coupon`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Coupon Deleted successfully');

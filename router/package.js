@@ -77,8 +77,7 @@ router.post("/add_categorydata", auth, upload.single('image'), async(req, res)=>
         if (await DataInsert(`tbl_package_category`, `image, name, status`,
             `'${imageUrl}', ${esname}, ${statuss}`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Category Add successfully');
@@ -121,8 +120,7 @@ router.post("/edit_categorydata/:id", auth, upload.single('image'), async(req, r
         if (await DataUpdate(`tbl_package_category`, `image = '${imageUrl}', name = ${esname}, status = ${statuss}`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Category Updated successfully');
@@ -141,8 +139,7 @@ router.get("/delete_category/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_package_category`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Category Deleted successfully');
@@ -193,8 +190,7 @@ router.post("/edit_package_setting", auth, msetting.single('image'), async(req, 
         if (await DataUpdate(`tbl_module_setting`, `image = '${imageUrl}', name = ${estitle}, description = ${descri}`,
             `id = '3'`, req.hostname, req.protocol) == -1) {
                 
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
             
         // const imageUrl = req.file ? "uploads/module_setting/" + req.file.filename : null;
@@ -266,8 +262,7 @@ router.post("/add_package", auth, package.single('image'), async(req, res)=>{
             '${num_of_kg}', '${radius_km}', '${length}', '${weight}', '${height}', '${comission_rate}', '${crate}', '${extra_charge}', '${offer}', '${minfare}', '${maxifare}', 
             '${ctype}', '${statuss}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Package Add successfully');
@@ -346,8 +341,7 @@ router.post("/edit_package/:id", auth, package.single('image'), async(req, res)=
             height = '${height}', comission_rate = '${comission_rate}', comission_type = '${crate}', extra_charge = '${extra_charge}', bidding = '${offer}', minimum_fare = '${minfare}', 
             maximum_fare = '${maxifare}', whether_charge = '${ctype}', status = '${statuss}'`, `id = '${oustation_list[0].id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror); 
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Package Updated successfully');
@@ -365,8 +359,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_package`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Package Deleted successfully');

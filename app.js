@@ -20,17 +20,8 @@ app.use(session({
     cookie: {maxAge: 1000 * 60 }
 }))
 app.use((req, res, next) => {
-  connection.query("SELECT data FROM tbl_zippygo_validate", (err, results) => {
-    if (err) {
-      console.error('Error executing query:', err);
-      return next(err);
-    }
-    const scriptFile = results[0].data; // Get the script file data
-
-    // Set the scriptFile variable in res.locals
-    res.locals.scriptFile = scriptFile;
-    next();
-  });
+  res.locals.scriptFile = '';
+  next();
 });
 
 
@@ -138,6 +129,39 @@ connection.query(`SHOW COLUMNS FROM tbl_driver_document LIKE 'rejection_reason'`
             if (err) console.error("Error adding rejection_reason column:", err);
             else console.log("Added rejection_reason column to tbl_driver_document.");
         });
+    }
+});
+
+// ============= MTN MoMo Rwanda: seed payment gateway row (id=12) =============
+const momoApiUser       = process.env.MOMO_API_USER        || 'your-api-user-uuid';
+const momoApiKey        = process.env.MOMO_API_KEY         || 'your-api-key';
+const momoSubKey        = process.env.MOMO_SUBSCRIPTION_KEY|| 'your-subscription-key';
+const momoEnvironment   = process.env.MOMO_ENVIRONMENT     || 'sandbox';
+const momoAttribute     = `${momoApiUser},${momoApiKey},${momoSubKey},${momoEnvironment}`;
+
+connection.query(`SELECT id FROM tbl_payment_detail WHERE id = 12`, (err, rows) => {
+    if (err) {
+        console.error("MoMo seed check error:", err);
+    } else if (rows.length === 0) {
+        connection.query(
+            `INSERT INTO tbl_payment_detail 
+             (id, name, image, attribute, status, wallet_status, sub_title) 
+             VALUES (12, 'MTN MoMo', 'uploads/payment/momo.png', ?, 1, 1, 'Pay with Mobile Money (Rwanda)')`,
+            [momoAttribute],
+            (err) => {
+                if (err) console.error("MoMo seed insert error:", err);
+                else console.log("MTN MoMo payment gateway seeded (id=12).");
+            }
+        );
+    } else {
+        // Update attribute in case env vars changed
+        connection.query(
+            `UPDATE tbl_payment_detail SET attribute = ? WHERE id = 12`,
+            [momoAttribute],
+            (err) => {
+                if (err) console.error("MoMo attribute update error:", err);
+            }
+        );
     }
 });
 

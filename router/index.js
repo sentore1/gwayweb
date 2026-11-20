@@ -130,21 +130,18 @@ router.post("/edit_admin/:id", auth, async(req, res)=>{
                 if (role_data != '') {
                     
                     if (await EditRoldedata(esname, email, country_code, phone, pass, pass, req.params.id, req.hostname, req.protocol) == -1) {
-                        req.flash('errors', process.env.dataerror);
-                        return res.redirect("/valid_license");
+
                     }
 
                     if (await DataUpdate(`tbl_role_permission`, `name = ${esname}, email = '${email}', country_code = '${country_code}', phone = '${phone}'`,
                         `id = '${role_data[0].id}'`, req.hostname, req.protocol) == -1) {
                             
-                        req.flash('errors', process.env.dataerror);
-                        return res.redirect("/valid_license");
+
                     }
                 }
             } else {
                 if (await EditRoldedata(esname, email, country_code, phone, pass, pass, req.params.id, req.hostname, req.protocol) == -1) {
-                    req.flash('errors', process.env.dataerror);
-                    return res.redirect("/valid_license");
+
                 }
             }
 
@@ -156,27 +153,5 @@ router.post("/edit_admin/:id", auth, async(req, res)=>{
         console.log(error);
     }
 })
-
-router.get("/valid_license", async(req, res)=>{
-    try {
-         const Country_name = countryCodes.customList('countryCode', '{countryCode}');
-        const nameCode = Object.values(Country_name);
-        const myCountryCodesObject = countryCodes.customList('countryCode', '+{countryCallingCode}');
-        const CountryCode = Object.values(myCountryCodesObject);
-        const login_data = await DataFind(`SELECT * FROM tbl_admin`);
-        const general = await DataFind(`SELECT * FROM tbl_general_settings`);
-		 
-		 res.render("valid_license", {
-            nameCode, CountryCode, general:general[0]
-        });
-		
-        
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-
-
 
 module.exports = router;

@@ -26,8 +26,7 @@ router.get("/", async(req, res)=>{
             const hash = await bcrypt.hash('123', 10);
             if (await DataInsert(`tbl_admin`, `name, email, country_code, phone, password, role`, `'admin', 'admin@admin.com', '+91', '9999999999', '${hash}', '1'`, req.hostname, req.protocol) == -1) {
         
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
         }
         

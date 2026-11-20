@@ -88,8 +88,7 @@ router.post("/add_rental", auth, upload.single('image'), async(req, res)=>{
             `'${imageUrl}', ${esname}, '${per_hour_charge}', '${per_hour_discount}', '${num_of_hour}', '${min_far_limit_km}', '${after_min_charge}', '${after_km_charge}', 
             '${comission_rate}', '${crate}', '${extra_charge}', '${JSON.stringify(avehicle)}', '${offer}', '${minfare}', '${maxifare}', '${ctype}', '${statuss}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Rental Add successfully');
@@ -150,8 +149,7 @@ router.post("/edit_rental/:id", auth, upload.single('image'), async(req, res)=>{
             whether_charge = '${ctype}', status = '${statuss}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Rental Updated successfully');
@@ -169,8 +167,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_rental`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Rental Deleted successfully');
@@ -217,8 +214,7 @@ router.post("/edit_rental_setting", auth, msetting.single('image'), async(req, r
         if (await DataUpdate(`tbl_module_setting`, `image = '${imageUrl}', name = ${estitle}, description = ${descri}`,
             `id = '2'`, req.hostname, req.protocol) == -1) {
                 
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
             
         // const imageUrl = req.file ? "uploads/module_setting/" + req.file.filename : null;

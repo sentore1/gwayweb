@@ -77,8 +77,7 @@ router.post("/add_vehicle", auth, upload.fields([{name: 'image', maxCount: 1}, {
             `'${imageUrl}', '${mapimg}', ${esname}, ${descri}, '${min_km_distance}', '${min_km_price}', '${after_km_price}', '${comission_rate}', '${crate}', '${extra_charge}', '${passenger_capacity}', 
             '${offer}', '${ctype}', '${statuss}', '${minfare}', '${maxifare}', '${hstatus}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Vehicle Add successfully');
@@ -145,8 +144,7 @@ router.post("/edit_vehicle/:id", auth, upload.fields([{name: 'image', maxCount: 
             minimum_fare = '${minfare}', maximum_fare = '${maxifare}', home_visible_status = '${hstatus}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Vehicle Updated successfully');
@@ -165,8 +163,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_vehicle`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Vehicle Deleted successfully');

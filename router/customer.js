@@ -62,8 +62,7 @@ router.post("/add_customer", auth, async(req, res)=>{
 
             `'', ${esname}, '${email}', '${country_code}', '${phone}', '${hash}', '${statuss}', '${otp_result}', '0', '${date}'`, req.hostname, req.protocol) == -1) {
             
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Customer Add successfully');
@@ -135,8 +134,7 @@ router.post("/edit_customer/:id", auth, async(req, res)=>{
             `name = ${esname}, email = '${email}', country_code = '${country_code}', phone = '${phone}', password = '${pass}', status = '${statuss}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Customer Updated successfully');
@@ -154,8 +152,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_customer`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Customer Deleted successfully');

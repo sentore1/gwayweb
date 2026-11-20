@@ -70,8 +70,7 @@ router.post("/add_zone", auth, async(req, res)=>{
 
         if (await DataInsert(`tbl_zone`, `name, status, lat_lon, lat_lon_polygon`, `'${name}', '${status}', '${zone}', ST_GeomFromText(${mysql.escape(polygonWKT)}, 4326)`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Zone Add successfully');
@@ -107,8 +106,7 @@ router.post("/edit_zone", auth, async(req, res)=>{
         if (zone_lat_lon == "") {
             if (await DataUpdate(`tbl_zone`, `name = ${esname}, status = '${status}'`, `id = '${zone_id}'`, req.hostname, req.protocol) == -1) {
         
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
             
         } else {
@@ -153,8 +151,7 @@ router.post("/edit_zone", auth, async(req, res)=>{
             if (await DataUpdate(`tbl_zone`, `name = '${name}', status = '${status}', lat_lon = '${zone}', lat_lon_polygon = ST_GeomFromText(${mysql.escape(polygonWKT)}, 4326)`, 
                 `id = '${zone_id}'`, req.hostname, req.protocol) == -1) {
         
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
         }
 
@@ -176,8 +173,7 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_zone`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Zone Deleted successfully');

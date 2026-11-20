@@ -98,14 +98,12 @@ router.post("/add_document", auth, async(req, res)=>{
         if (await DataInsert(`tbl_document_setting`, `name, require_image_side, input_require, status, req_field_name`,
             `${esname}, ${documant_side}, ${required}, '${statuss}', '${req_name}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         if (await DataUpdate(`tbl_driver`, `approval_status = '0'`, `1 = 1`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Document Type Add successfully');
@@ -132,8 +130,7 @@ router.post("/edit_document/:id", auth, async(req, res)=>{
             req_field_name = ${req_name}`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Document Type Updated successfully');
@@ -152,8 +149,7 @@ router.get("/document_delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_document_setting`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Document Type Deleted successfully');
@@ -195,8 +191,7 @@ router.post("/add_preference", auth, preference.single('image'), async(req, res)
         if (await DataInsert(`tbl_vehicle_preference`, `image, name, status`,
             `'${imageUrl}', ${esname}, '${statuss}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Vehicle Preference Add successfully');
@@ -228,8 +223,7 @@ router.post("/edit_preference/:id", auth, preference.single('image'), async(req,
         if (await DataUpdate(`tbl_vehicle_preference`, `image = '${imageUrl}', name = ${esname}, status = '${statuss}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Vehicle Preference Updated successfully');
@@ -248,8 +242,7 @@ router.get("/delete_preference/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_vehicle_preference`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Vehicle Preference Deleted successfully');
@@ -329,8 +322,7 @@ router.post("/add_driver", auth, upload.fields([{name: 'profile_image', maxCount
             '${vehicle_prefrence}', '${iban_number}', '${bank_name}', '${account_hol_name}', '${vat_id}', '${statuss}', '0', '0', '0', '0', '0', '', '', '0', '0', '0', '${d.date}',
             '0', '0', '0'`,
             req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Driver Add successfully');
@@ -458,8 +450,7 @@ router.post("/edit_driver/:id", auth, upload.fields([{name: 'profile_image', max
             account_hol_name = '${account_hol_name}', vat_id = '${vat_id}', status = '${statuss}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Driver Updated successfully');
@@ -477,13 +468,11 @@ router.get("/delete/:id", auth, async(req, res)=>{
 }
         if (await DataDelete(`tbl_driver`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         if (await DataDelete(`tbl_driver_document`, `driver_id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Driver Deleted successfully');
@@ -635,8 +624,7 @@ router.post("/add_documentdata/:id", auth, async(req, res, next)=>{
                     if (await DataInsert(`tbl_driver_document`, `driver_id, document_id, image, document_number, status, rejection_reason`,
                         `'${req.params.id}', '${documant_list[i].id}', '${img}', '${input}', '${statuss}', '${rej_reason}'`, req.hostname, req.protocol) == -1) {
             
-                        req.flash('errors', process.env.dataerror);
-                        return res.redirect("/valid_license");
+
                     }
 
                     const docName = documant_list[i].name || "Document";
@@ -656,8 +644,7 @@ router.post("/add_documentdata/:id", auth, async(req, res, next)=>{
         const driverdata = await DataFind(`SELECT * FROM tbl_driver_document WHERE driver_id = "${req.params.id}"`);
 
         if (await AllFunction.DriverUpdate(documant_list, driverdata, req.params.id, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Document Add successfully');
@@ -714,16 +701,14 @@ router.post("/edit_documentdata/:id", auth, driver_doc.fields([{name: 'frontimag
         if (await DataUpdate(`tbl_driver_document`, `image = '${img}', document_number = '${inpout}', status = '${statuss}', rejection_reason = '${rej_reason}'`,
             `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
     
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         const documant_list = await DataFind(`SELECT * FROM tbl_document_setting WHERE status = "1"`);
         const driverdata = await DataFind(`SELECT * FROM tbl_driver_document WHERE driver_id = "${driver_doc[0].driver_id}"`);
 
         if (await AllFunction.DriverUpdate(documant_list, driverdata, driver_doc[0].driver_id, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         const docName = driver_doc[0].name || "Document";
@@ -750,16 +735,14 @@ router.get("/delete_documentdata/:id", auth, async(req, res)=>{
 
         if (await DataDelete(`tbl_driver_document`, `id = '${driver_doc[0].id}'`, req.hostname, req.protocol) == -1) {
         
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         const documant_list = await DataFind(`SELECT * FROM tbl_document_setting WHERE status = "1"`);
         const driverdata = await DataFind(`SELECT * FROM tbl_driver_document WHERE driver_id = "${driver_doc[0].driver_id}"`);
 
         if (await AllFunction.DriverUpdate(documant_list, driverdata, driver_doc[0].driver_id, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Document Deleted successfully');
@@ -911,8 +894,7 @@ router.post("/update_cash_amount/:id", auth, async(req, res)=>{
 
         if (parseFloat(cash_amount) > 0) {
             if (await DataUpdate(`tbl_driver`, `tot_cash = '${cash_amount}'`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
         }
         
@@ -961,8 +943,7 @@ router.post("/update_cash_status/:id", auth, async(req, res)=>{
             }
     
             if (await DataUpdate(`tbl_cash_adjust`, `status = '${newStatus}'`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-                req.flash('errors', process.env.dataerror);
-                return res.redirect("/valid_license");
+
             }
 
             if (newStatus === 1 && currentStatus !== 1) {
@@ -1023,8 +1004,7 @@ router.post("/add_def_noti", auth, async(req, res)=>{
 
         let esname = mysql.escape(title);
         if (await DataInsert(`tbl_default_notification`, `title`, `${esname}`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Default Notification Add successfully');
@@ -1044,8 +1024,7 @@ router.post("/edit_def_noti/:id", auth, async(req, res)=>{
 
         let esname = mysql.escape(title);
         if (await DataUpdate(`tbl_default_notification`, `title = ${esname}`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
 
         req.flash('success', 'Default Notification Updated successfully');
@@ -1063,8 +1042,7 @@ router.get("/delete_def_noti/:id", auth, async(req, res)=>{
     return res.redirect("back");
 }
         if (await DataDelete(`tbl_default_notification`, `id = '${req.params.id}'`, req.hostname, req.protocol) == -1) {
-            req.flash('errors', process.env.dataerror);
-            return res.redirect("/valid_license");
+
         }
         
         req.flash('success', 'Default Notification Deleted successfully');
